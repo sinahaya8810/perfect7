@@ -16,6 +16,8 @@ canvas{display:block;width:100%;background:#8fd3ff;touch-action:none}
 #getbody img{position:relative;filter:drop-shadow(0 0 12px #ffe08a);animation:pop .7s cubic-bezier(.2,1.6,.4,1) both,wob 1.2s .7s ease-in-out infinite}
 #getbody h2{position:relative;margin:8px 0 0;color:#ffe08a;animation:pop .5s .3s both}#getbody div,#getbody button{position:relative}
 .conf span{position:fixed;top:-30px;animation:fall 2.2s linear infinite}
+.bgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.bcard{border:3px solid;border-radius:8px;padding:3px 2px;text-align:center;background:#16213a;font-size:10px;cursor:pointer;line-height:1.3}.bcard img{height:40px;max-width:100%;object-fit:contain}.bcard.sel{outline:3px solid #ffe08a}.bcard .rb{display:inline-block;margin:2px 0 0;font-size:8px;padding:1px 3px;white-space:nowrap}
+#boxm .box{min-width:300px}#getbody .sgrid{width:92vw;max-width:380px}
 #gfl{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none}.rb{font-size:11px;padding:1px 6px;border-radius:8px;color:#111;margin-right:4px;font-weight:bold}
 #getbody img.gshake{animation:gshk .2s infinite,glowp .7s infinite;filter:drop-shadow(0 0 12px var(--c))}
 #getbody img.gpop{animation:pop .7s cubic-bezier(.2,1.6,.4,1) both,wob 1.2s .7s ease-in-out infinite;filter:drop-shadow(0 0 18px var(--c))}
@@ -24,9 +26,9 @@ canvas{display:block;width:100%;background:#8fd3ff;touch-action:none}
 .mys{width:100px;height:130px;border-radius:50% 50% 48% 48%/62% 62% 38% 38%;background:radial-gradient(circle at 35% 30%,#8a76c4,#2a2145 70%);border:3px solid #ffe08a;box-shadow:0 0 22px #ffe08acc;display:flex;align-items:center;justify-content:center;font-size:52px;color:#ffe08a;font-weight:bold;position:relative}
 #getbody .mys.gshake{animation:gshk .2s infinite,glowp .7s infinite}
 @keyframes spin{to{transform:rotate(360deg)}}@keyframes pop{from{transform:scale(0) rotate(-30deg)}to{transform:scale(1)}}@keyframes wob{50%{transform:rotate(6deg) scale(1.06)}}@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
-#shopm .box{max-height:88vh;overflow:auto;min-width:290px;max-width:92vw}.srow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0;font-size:14px}.srow select{max-width:130px}
+#shopm .box,#boxm .box{max-height:88vh;overflow:auto;min-width:290px;max-width:92vw}.srow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0;font-size:14px}.srow select{max-width:130px}
 #msg{flex:1}
-#menu,#shopm{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:8}#menu .box,#shopm .box{background:#2a3f57;border:3px solid #fff;border-radius:10px;padding:14px;min-width:270px;line-height:1.9}#menu h3{margin:0 0 6px}.danger{background:#c0392b;border-color:#6e1d14}
+#menu,#shopm,#boxm{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:8}#menu .box,#shopm .box,#boxm .box{background:#2a3f57;border:3px solid #fff;border-radius:10px;padding:14px;min-width:270px;line-height:1.9}#menu h3{margin:0 0 6px}.danger{background:#c0392b;border-color:#6e1d14}
 #cf{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:11}#cf .box{background:#2a3f57;border:3px solid #fff;border-radius:10px;padding:16px;text-align:center}
 #get{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;z-index:10;text-align:center;overflow:hidden}
 #getbody{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -50,9 +52,10 @@ button:disabled{opacity:.4;cursor:not-allowed}
 if(d.textContent.indexOf(m)<0&&d.textContent.length<400)d.textContent+=m+'\n'};
 window.addEventListener('error',function(e){__rep((e.message||'error')+(e.lineno?' (行'+e.lineno+')':''))});</script>
 <div id="wrap"><canvas id="cv" width="640" height="360"></canvas><div id="boot" style="position:absolute;left:0;right:0;top:35%;text-align:center;color:#12324a;font:14px/1.6 sans-serif;padding:0 24px;pointer-events:none">読み込み中…<br><small>この表示が消えないときは、ファイルが途中で切れています。GitHubには「Upload files」でファイルごとアップロードしてください。</small></div><div id="zoom"><button onclick="zoom(1.3)">＋</button><button onclick="zoom(.77)">－</button><br><button onclick="focusSel()">🔍</button><button onclick="zoom(0)">全体</button></div></div>
-<div id="bar"><div id="msg"></div><button onclick="openShop()">🛒 ショップ</button><button onclick="openMenu()">☰ メニュー</button></div>
+<div id="bar"><div id="msg"></div><button onclick="openBox()">📦 ボックス</button><button onclick="openShop()">🛒 ショップ</button><button onclick="openMenu()">☰ メニュー</button></div>
 <div id="panel">モンスターをタップして選択</div>
-<div id="shopm"><div class="box"><h3>ショップ</h3><div id="shopBody"></div><div style="margin-top:8px"><button onclick="closeShop()">閉じる</button></div></div></div>
+<div id="shopm"><div class="box"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">ショップ</h3><button onclick="closeShop()">閉じる</button></div><div id="shopBody"></div><div style="margin-top:8px"><button onclick="closeShop()">閉じる</button></div></div></div>
+<div id="boxm"><div class="box"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">📦 たまごボックス</h3><button onclick="closeBox()">閉じる</button></div><div id="boxBody"></div></div></div>
 <div id="menu"><div class="box"><h3>メニュー</h3>
 <div>名前 <input id="nm" maxlength="16" placeholder="ユーザー名" oninput="setName(this.value)" style="width:160px;font:inherit;padding:3px"></div>
 <div id="cdrow" style="display:none;margin:4px 0">コード <input id="cd" maxlength="16" style="width:130px;font:inherit;padding:3px"><button onclick="redeem()">決定</button></div>
@@ -92,8 +95,9 @@ const CONFIG={
  CHEST_H:12, CHEST:{coin:100,stone:10,gem:10,fruit:10}, // 宝箱の出現間隔(時間)と中身
  CODES:{                                          // コード(大文字)：報酬。egg=その種族のたまごをもらう。どれも1度だけ
   '3141592653':{gem:100,stone:100,coin:500,timer:5,xp:5},'PRESENT':{xp:50,timer:10},'EGG':{egg:'イースター'}}, START_FRUIT:5, START_TIMER:1,
- START_SIZE:2, MAX_SIZE:6,                                          // 2x2=4マス → 5x5=25マス
- EXPAND:[{c:100,s:8},{c:250,s:25},{c:600,s:60},{c:1200,s:120}],
+ START_SIZE:2, MAX_SIZE:7,                                          // 2x2=4マス → 5x5=25マス
+ EXPAND:[{c:100,s:8},{c:250,s:25},{c:600,s:60},{c:1200,s:120},{c:2500,s:250}],
+ BOX_START:20, BOX_STEP:10, BOX_MAX:200, BOX_COST:{coin:1000,gem:50,stone:50}, MULTI:10,  // たまごボックスの容量・拡張コスト・まとめ買い数
  GAME_SEC:20, XP_TABLE:[[0,0],[1,5],[20,10],[35,20],[50,30],[65,40],[80,50]],  // [達成率(%)以上, 獲得XP] 達成率=スコア÷そのゲームのMG_MAX
  MG_MAX:[26,28,30,60,14,80,65,30],           // 各ミニゲームの「満点に近いスコア」(ジャンプ/キャッチ/モグラ/リズム/記憶/風船/色分け/数字)
  START_COIN:100, KEY:'iso_colony_v1'
@@ -142,7 +146,7 @@ function mk(sp,rar){const m={id:Math.random(),rar:rar||0,sp:sp??pickSpecies(rar|
 function place(m){m.gx=rnd(.4,S?S.size-.4:1.6);m.gy=rnd(.4,S?S.size-.4:1.6);m.tx=m.gx;m.ty=m.gy;m.w=rnd(1,4);m.ph=rnd(0,6);m.mode="idle";m.jt=0;m.flash=0}
 function load(){try{S=JSON.parse(localStorage.getItem(C.KEY))}catch(e){}
  if(!S){S={coin:C.START_COIN,stone:0,size:C.START_SIZE,mons:[],last:now(),acc:0};S.mons.push(mk(0))}
- S.gem=S.gem||0;S.xp=S.xp||0;S.timer=S.timer||0;if(!S.starter){S.starter=1;S.timer+=C.START_TIMER}S.f1=S.f1==null?C.START_FRUIT:S.f1;S.f2=S.f2||0;S.f3=S.f3||0;S.codes=S.codes||{};if(!S.chestNext)S.chestNext=now()+C.CHEST_H*3600;S.timer=S.timer||0;S.name=S.name||'';S.mons.forEach(place);dispSize=S.size}
+ S.box=S.box||[];S.boxCap=S.boxCap||C.BOX_START;S.gem=S.gem||0;S.xp=S.xp||0;S.timer=S.timer||0;if(!S.starter){S.starter=1;S.timer+=C.START_TIMER}S.f1=S.f1==null?C.START_FRUIT:S.f1;S.f2=S.f2||0;S.f3=S.f3||0;S.codes=S.codes||{};if(!S.chestNext)S.chestNext=now()+C.CHEST_H*3600;S.timer=S.timer||0;S.name=S.name||'';S.mons.forEach(place);dispSize=S.size}
 function save(){if(wiping)return;try{localStorage.setItem(C.KEY,JSON.stringify(S))}catch(e){}}
 const msg=t=>$('msg').textContent=t;
 
@@ -198,8 +202,30 @@ function release(){const m=cur(),r0=m&&C.RELEASE[m.stage],r=r0&&(SPECIES[m.sp].s
 function revive(){const m=cur();if(!m||!m.dead||S.stone<C.REVIVE)return;
  S.stone-=C.REVIVE;m.dead=false;m.hunger=50;m.starve=0;act('蘇生した！')}
 function buyEgg(mode){if(mode==='pick'&&!speciesFor(pickRar).includes(pickSp))return;const p=mode==='pick'?C.RARITY[pickRar].pick:C.EGG_PRICE;
- if(S.mons.length>=S.size**2)return msg('キャパがいっぱいです');if(S.coin<p)return msg('コインが足りません');
- S.coin-=p;lastEgg=mk(mode==='pick'?pickSp:undefined,mode==='pick'?pickRar:rollRar());S.mons.push(lastEgg);closeShop();act();showGet(lastEgg)}
+ if(S.box.length>=S.boxCap)return msg('ボックスがいっぱいです');if(S.coin<p)return msg('コインが足りません');
+ S.coin-=p;lastEgg=mk(mode==='pick'?pickSp:undefined,mode==='pick'?pickRar:rollRar());S.box.push(lastEgg);closeShop();act('たまごをボックスに入れた');showGet(lastEgg)}
+let multi=null,boxSel=null;
+function buyMulti(){const n=C.MULTI,p=C.EGG_PRICE*n;if(S.boxCap-S.box.length<n)return msg('ボックスの空きが足りません');if(S.coin<p)return msg('コインが足りません');
+ S.coin-=p;const eggs=[];for(let i=0;i<n;i++){const e=mk(undefined,rollRar());S.box.push(e);eggs.push(e)}closeShop();act(n+'個のたまごをボックスに入れた');playMulti(eggs)}
+function playMulti(eggs){multi={eggs,i:0};stepMulti()}
+function stepMulti(){if(!multi)return;if(multi.i>=multi.eggs.length){const e=multi.eggs;multi=null;showSummary(e);return}
+ showGet(multi.eggs[multi.i],{auto:true,fast:true,done:()=>{if(multi){multi.i++;stepMulti()}}})}
+function skipMulti(){gT.forEach(clearTimeout);gT=[];if(multi){const e=multi.eggs;multi=null;showSummary(e)}}
+function showSummary(eggs){gT.forEach(clearTimeout);gT=[];$('getbody').style.animation='none';const best=Math.max(...eggs.map(e=>e.rar||0));lastEgg=null;
+ $('getbody').innerHTML=`<h2 style="color:#ffe08a;margin:0 0 8px">${eggs.length}連の結果</h2><div class="bgrid sgrid">${eggs.map(e=>{const R=C.RARITY[e.rar||0];return `<div class="bcard" style="border-color:${R.col}"><img src="${SPR[IDS[e.sp]+'_egg']}" alt=""><div class="bn">${SPECIES[e.sp].n}</div><div class="rb" style="background:${R.col}">${R.n}</div></div>`}).join('')}</div><button onclick="closeGet()" style="margin-top:10px">OK</button>`;
+ $('get').style.background=`radial-gradient(circle at 50% 30%,${C.RARITY[best].col}66,#0a0814 75%),#0a0814`;$('get').style.display='flex';$('get').onclick=null}
+function boxMsg(t){const e=$('boxMsg');if(e)e.textContent=t}
+function boxUI(){const sel=S.box.find(m=>String(m.id)===boxSel);if(!sel)boxSel=null;
+ const panel=sel?`<div>${rb(sel)}<b>${SPECIES[sel.sp].n}</b>のたまご</div><div style="margin-top:4px"><button onclick="boxMove('${sel.id}')">コロニーへ放出</button><button onclick="boxSell('${sel.id}')">売却 ${ic('coin')}${sellPrice(sel)}</button></div>`:'<div class="dev">たまごを選ぶと、コロニーへ放出／売却ができます</div>';
+ $('boxBody').innerHTML=`<div>📦 ${S.box.length}/${S.boxCap}　コロニー ${S.mons.length}/${S.size**2}</div><div id="boxMsg" class="dev" style="min-height:18px"></div>${panel}<hr><div class="bgrid">${S.box.map(m=>{const R=C.RARITY[m.rar||0];return `<div class="bcard ${String(m.id)===boxSel?'sel':''}" style="border-color:${R.col}" onclick="boxSelect('${m.id}')"><img src="${SPR[IDS[m.sp]+'_egg']}" alt=""><div class="bn">${SPECIES[m.sp].n}</div></div>`}).join('')||'<div class="dev" style="grid-column:1/-1">ボックスは空です</div>'}</div>`}
+function boxSelect(id){boxSel=boxSel===id?null:id;boxUI()}
+function boxMove(id){const m=S.box.find(x=>String(x.id)===id);if(!m)return;if(S.mons.length>=S.size**2){boxMsg('コロニーがいっぱいです');return}
+ S.box=S.box.filter(x=>x!==m);place(m);S.mons.push(m);boxSel=null;act();boxMsg('コロニーに出した！')}
+function boxSell(id){const m=S.box.find(x=>String(x.id)===id);if(!m)return;const p=sellPrice(m);
+ ask(`${SPECIES[m.sp].n}のたまごを🪙${p}で売りますか？`,'はい、売る',()=>{S.coin+=p;S.box=S.box.filter(x=>x!==m);boxSel=null;act();boxMsg('売却した')})}
+function boxUpgrade(){const c=C.BOX_COST;if(S.boxCap>=C.BOX_MAX||S.coin<c.coin||S.gem<c.gem||S.stone<c.stone)return;S.coin-=c.coin;S.gem-=c.gem;S.stone-=c.stone;S.boxCap=Math.min(C.BOX_MAX,S.boxCap+C.BOX_STEP);act('ボックスを拡張した！')}
+function openBox(){boxUI();$('boxm').style.display='flex'}
+function closeBox(){$('boxm').style.display='none'}
 function buyTimer(){if(S.gem<C.TIMER_GEM_PRICE)return;S.gem-=C.TIMER_GEM_PRICE;S.timer++;act('⏱を手に入れた！')}
 function sellAsk(id){const m=S.mons.find(x=>String(x.id)===id);if(!m)return;const p=sellPrice(m);
  ask(`${nmOf(m)}（${SL[m.stage]}）を🪙${p}で売りますか？`,'はい、売る',()=>{S.coin+=p;S.mons=S.mons.filter(x=>x!==m);if(sel===m.id)sel=null;act(`売却して🪙${p}を手に入れた`)})}
@@ -209,11 +235,11 @@ function landFx(old){const n=S.size,oyF=(H-n*TH)/2-14,Q=(x,y)=>[ox+(x-y)*TW/2,oy
  const c=Q(n/2,n/2);parts.push({txt:'土地が広がった！',x:c[0],y:c[1]-40,l:0,d:1.8});parts.push({ring:1,x:c[0],y:c[1],l:0,d:1.2});parts.push({ring:1,x:c[0],y:c[1],l:-.25,d:1.2})}
 function expand(){const c=C.EXPAND[S.size-C.START_SIZE];if(!c||S.coin<c.c||S.stone<c.s)return;
  S.coin-=c.c;S.stone-=c.s;const old=S.size;S.size++;landFx(old);closeShop();act(`土地を拡張！ キャパ${S.size**2}`)}
-function act(t){if(t)msg(t);save();ui();shopUI()}
+function act(t){if(t)msg(t);save();ui();shopUI();boxUI()}
 
 /* ===== UI ===== */
 let pick=-1;
-function hud(){$('menuInfo').innerHTML=`キャパ: ${S.mons.length}/${S.size**2}（土地 ${S.size}×${S.size}）<br>${ic('coin')} ${S.coin}　${ic('stone')} ${S.stone}　${ic('gem')} ${S.gem}　⏱ ${S.timer}<br>${ic('xp')} ${S.xp}　${ic('f1')} ${S.f1}　${ic('f2')} ${S.f2}　${ic('f3')} ${S.f3}<br>🕐 次回収集: ${Math.ceil((3600-S.acc)/60)}分`}
+function hud(){$('menuInfo').innerHTML=`キャパ: ${S.mons.length}/${S.size**2}（土地 ${S.size}×${S.size}）　📦 ${S.box.length}/${S.boxCap}<br>${ic('coin')} ${S.coin}　${ic('stone')} ${S.stone}　${ic('gem')} ${S.gem}　⏱ ${S.timer}<br>${ic('xp')} ${S.xp}　${ic('f1')} ${S.f1}　${ic('f2')} ${S.f2}　${ic('f3')} ${S.f3}<br>🕐 次回収集: ${Math.ceil((3600-S.acc)/60)}分`}
 function ui(){hud();
  const m=cur();let h='モンスターをタップして選択';
  if(m){const s=SPECIES[m.sp],need=needXp(m);
@@ -226,10 +252,11 @@ function ui(){hud();
   if(s.note)h+=`<div class="dev">${s.note}</div>`}
  $('panel').innerHTML=h}
 let pickSp=0,pickRar=0;
-function shopUI(){const lst=speciesFor(pickRar);if(!lst.includes(pickSp))pickSp=lst[0];const fb=!SPECIES.some(s=>tierOf(s)===pickRar),c=C.EXPAND[S.size-C.START_SIZE],free=S.mons.length<S.size**2,gods=S.mons.filter(m=>m.stage==='god');
+function shopUI(){const lst=speciesFor(pickRar);if(!lst.includes(pickSp))pickSp=lst[0];const fb=!SPECIES.some(s=>tierOf(s)===pickRar),c=C.EXPAND[S.size-C.START_SIZE],free=S.box.length<S.boxCap,free10=S.boxCap-S.box.length>=C.MULTI,gods=S.mons.filter(m=>m.stage==='god');
  const row=(l,b,pr,dis,fn)=>`<div class="srow"><span>${l}</span><button onclick="${fn}" ${dis?'disabled':''}>${pr}</button></div>`;
  $('shopBody').innerHTML=`<div>${ic('coin')} ${S.coin}　${ic('stone')} ${S.stone}　${ic('gem')} ${S.gem}　⏱ ${S.timer}</div><hr>
- ${row('🥚 ランダムたまご','',ic('coin')+C.EGG_PRICE,S.coin<C.EGG_PRICE||!free,"buyEgg('rand')")}<div class="dev">${C.RARITY.map(R=>(R.hide?'???':R.n)+R.p+'%').join(' / ')}<br>※レアリティごとに出るキャラが決まっています</div>
+ ${row('🥚 ランダムたまご','',ic('coin')+C.EGG_PRICE,S.coin<C.EGG_PRICE||!free,"buyEgg('rand')")}
+ ${row('🥚×'+C.MULTI+' ランダム10連','',ic('coin')+C.EGG_PRICE*C.MULTI,S.coin<C.EGG_PRICE*C.MULTI||!free10,'buyMulti()')}<div class="dev">${C.RARITY.map(R=>(R.hide?'???':R.n)+R.p+'%').join(' / ')}<br>※レアリティごとに出るキャラが決まっています</div>
  <div class="srow">🎯 えらぶたまご<select onchange="pickSp=+this.value">${lst.map(i=>`<option value="${i}" ${i===pickSp?'selected':''}>${SPECIES[i].n}</option>`).join('')}</select></div>
  <div class="srow"><select onchange="pickRar=+this.value;shopUI()">${C.RARITY.map((R,i)=>R.hide?'':`<option value="${i}" ${i===pickRar?'selected':''}>${R.n}</option>`).join('')}</select><button onclick="buyEgg('pick')" ${S.coin<C.RARITY[pickRar].pick||!free?'disabled':''}>${ic('coin')}${C.RARITY[pickRar].pick}</button></div>${fb?'<div class="dev">このレアリティの専用キャラは準備中です（ノーマルキャラが出ます）</div>':''}<hr>
  ${C.FRUITS.map(f=>row(`${ic(f.id)} ${f.name}（満腹+${f.fill}）×${S[f.id]}`,'',ic('gem')+f.gem,S.gem<f.gem,`buyItem('${f.id}')`)).join('')}
@@ -237,6 +264,7 @@ function shopUI(){const lst=speciesFor(pickRar);if(!lst.includes(pickSp))pickSp=
  ${row(`${ic('xp')} XPポーション（XP+${C.XP_POTION}）×${S.xp}`,'',ic('stone')+C.XP_POTION_STONE,S.stone<C.XP_POTION_STONE,"buyItem('xp')")}<hr>
  <div>🏷 名札（神族に名前をつける）</div>${gods.map(m=>row(rb(m)+nmOf(m),'',ic('coin')+C.NAMETAG_PRICE,S.coin<C.NAMETAG_PRICE,`nickOpen('${m.id}')`)).join('')||'<div class="dev">神族がいません</div>'}<hr>
  <div class="srow">🗺 土地拡張${c?` ${S.size}→${S.size+1}<button onclick="expand()" ${S.coin<c.c||S.stone<c.s?'disabled':''}>${ic('coin')}${c.c} ${ic('stone')}${c.s}</button>`:'（最大）'}</div>
+ <div class="srow"><span>📦 ボックス ${S.box.length}/${S.boxCap}</span>${S.boxCap>=C.BOX_MAX?'（最大）':`<button onclick="boxUpgrade()" ${S.coin<C.BOX_COST.coin||S.gem<C.BOX_COST.gem||S.stone<C.BOX_COST.stone?'disabled':''}>+${C.BOX_STEP} ${ic('coin')}${C.BOX_COST.coin} ${ic('gem')}${C.BOX_COST.gem} ${ic('stone')}${C.BOX_COST.stone}</button>`}</div>
  <hr><div>キャラを売る</div>${S.mons.map(m=>row(`${rb(m)}${nmOf(m)}（${SL[m.stage]}）`,'',ic('coin')+sellPrice(m),false,`sellAsk('${m.id}')`)).join('')||'<div class="dev">いません</div>'}`}
 function isGM(){return(S.name||'').trim()===C.GM_NAME}
 function gmUI(){$('gm').style.display=isGM()?'block':'none'}
@@ -250,24 +278,24 @@ let wiping=false;
 function ask(t,yl,fn){$('cft').textContent=t;$('cfy').textContent=yl;$('cfy').onclick=()=>{$('cf').style.display='none';fn()};$('cf').style.display='flex'}
 function delData(){ask('本当にリセットしますか？','はい',()=>ask('最終確認です。すべてのデータが消え、元に戻せません。リセットしますか？','はい、リセットする',resetAll))}
 function resetAll(){try{localStorage.removeItem(C.KEY)}catch(e){}
- S={coin:C.START_COIN,stone:0,gem:0,timer:C.START_TIMER,starter:1,xp:0,f1:C.START_FRUIT,f2:0,f3:0,codes:{},chest:false,chestNext:now()+C.CHEST_H*3600,name:S.name||'',size:C.START_SIZE,mons:[],last:now(),acc:0};S.mons.push(mk(0));dispSize=S.size;
+ S={coin:C.START_COIN,stone:0,gem:0,timer:C.START_TIMER,starter:1,xp:0,f1:C.START_FRUIT,f2:0,f3:0,codes:{},box:[],boxCap:C.BOX_START,chest:false,chestNext:now()+C.CHEST_H*3600,name:S.name||'',size:C.START_SIZE,mons:[],last:now(),acc:0};S.mons.push(mk(0));dispSize=S.size;
  sel=null;fxQ.length=0;parts.length=0;zoom(0);save();closeMenu();ui();shopUI();msg('データをリセットしました')}
 let gT=[];
 function gflash(a,c){const f=$('gfl');f.style.background=c||'#fff';f.style.transition='none';f.style.opacity=a;requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.transition='opacity .7s';f.style.opacity=0}))}
-function showGet(m){const sp=SPECIES[m.sp],r=m.rar||0,R=C.RARITY[r],src=SPR[IDS[m.sp]+'_egg'],T=C.GET_INTRO[r]*1000;
+function showGet(m,opt){const sp=SPECIES[m.sp],r=m.rar||0,R=C.RARITY[r],src=SPR[IDS[m.sp]+'_egg'],T=C.GET_INTRO[r]*1000*(opt&&opt.fast?.45:1);
  gT.forEach(clearTimeout);gT=[];const at=(t,fn)=>gT.push(setTimeout(fn,t));
  $('getbody').style.animation='none';
  $('getbody').innerHTML=`<div class="rays" id="grays" style="opacity:0;background:repeating-conic-gradient(${R.col}88 0 10deg,transparent 10deg 20deg)"></div><div id="gmys" class="mys gshake" style="--c:#ffe08a;animation-duration:${.2-r*.04}s,${.7-r*.12}s">？</div><img id="geg" src="${src}" width="120" alt="" style="display:none;--c:${R.col}"><h2 id="gt1" style="visibility:hidden;font-size:${20+r*3}px;text-shadow:0 0 ${r*4}px ${R.col}">${sp.n}のタマゴをゲット！</h2><div id="gt2" style="visibility:hidden;font-weight:bold;color:${R.col};font-size:${15+r*2}px">${'★'.repeat(r+1)} ${R.n}</div><button id="gok" style="visibility:hidden" onclick="closeGet()">OK</button><div class="conf" id="gconf"></div>`;
- $('get').style.background='#0a0814';$('get').style.display='flex';
+ $('get').style.background='#0a0814';$('get').style.display='flex';if(opt&&opt.auto)$('gok').style.display='none';
  if(r>=1)at(T*.4,()=>{$('get').style.background=`radial-gradient(circle at 50% 40%,${R.col}55,#0a0814 75%),#0a0814`});
  const fc=r>=4?'#ffe27a':'#fff';if(r>=2)at(T*.6,()=>gflash(.35,fc));if(r>=3)at(T*.82,()=>gflash(.6,fc));if(r>=4)[.2,.4,.7,.9].forEach(k=>at(T*k,()=>gflash(.8,fc)));
- at(T+2500,()=>{const o=$('gok');if(o)o.style.visibility='visible'});$('get').onclick=()=>{const o=$('gok');if(o&&o.style.visibility==='visible')closeGet()};
+ at(T+2500,()=>{const o=$('gok');if(o)o.style.visibility='visible'});$('get').onclick=opt&&opt.auto?skipMulti:()=>{const o=$('gok');if(o&&o.style.visibility==='visible')closeGet()};
  at(T,()=>{gflash(1,fc);$('gmys').style.display='none';$('geg').style.display='block';$('geg').className='gpop';$('grays').style.opacity=1;$('gt1').style.visibility=$('gt2').style.visibility='visible';
   const gl=[['✨','⭐'],['✨','⭐','💠'],['✨','⭐','💎','🌟'],['✨','⭐','💎','🌟','👑'],['✨','🌟','👑','🪙','💰','⭐']][r];let c='';
   for(let i=0;i<[14,28,48,80,160][r];i++)c+=`<span style="left:${rnd(0,100)}%;animation-delay:${rnd(0,1.6)}s;font-size:${rnd(14,30)}px">${gl[i%gl.length]}</span>`;
   $('gconf').innerHTML=c;if(r>=1)$('get').style.background=`radial-gradient(circle at 50% 40%,${R.col}77,#0a0814 75%),#0a0814`;
-  if(r>=3)$('getbody').style.animation='gsc .1s '+(r>=4?24:10);at(500+r*250,()=>$('gok').style.visibility='visible')})}
-function closeGet(){gT.forEach(clearTimeout);gT=[];$('get').style.display='none';if(lastEgg){sel=lastEgg.id;fxQ.push({m:lastEgg,k:lastEgg.rar>=4?'god':'egg'});ui()}}
+  if(r>=3)$('getbody').style.animation='gsc .1s '+(r>=4?24:10);at(500+r*250,()=>{if(opt&&opt.auto)at(600,opt.done);else $('gok').style.visibility='visible'})})}
+function closeGet(){gT.forEach(clearTimeout);gT=[];multi=null;$('get').style.display='none';if(lastEgg&&S.mons.includes(lastEgg)){sel=lastEgg.id;fxQ.push({m:lastEgg,k:lastEgg.rar>=4?'god':'egg'});ui()}}
 function skip(h){if(!isGM())return;advance(h*3600);act(h+'時間経過')}
 function devExp(){if(!isGM())return;const m=cur();if(m&&!m.dead&&m.stage!=='egg'&&m.stage!=='god'){m.exp+=50;evo(m);act()}}
 
@@ -327,7 +355,7 @@ function drawFx(dt){for(const p of parts){p.l+=dt;if(p.l<0)continue;const u=p.l/
  else if(p.txt){g.globalAlpha=Math.min(1,2*(1-u));g.font=(p.big?'bold 26px':'bold 18px')+' sans-serif';g.textAlign='center';g.textBaseline='middle';g.lineWidth=4;g.strokeStyle='#7a4f00';g.fillStyle='#fff3a0';const y=p.y-u*20;g.strokeText(p.txt,p.x,y);g.fillText(p.txt,p.x,y);g.globalAlpha=1}
  else{p.vy+=60*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;g.globalAlpha=Math.max(0,1-u);g.fillStyle=p.c;g.fillRect(p.x-p.s/2,p.y-p.s/2,p.s,p.s);g.globalAlpha=1}}
  for(let i=parts.length;i--;)if(parts[i].l>=parts[i].d)parts.splice(i,1)}
-const BS=[1,1,2,1.6,1.3,1.1,.95,.95];const sc=()=>{const i=Math.floor(dispSize),f=dispSize-i;return cam.z*(BS[i]+(BS[Math.min(7,i+1)]-BS[i])*f)};
+const BS=[1,1,2,1.6,1.3,1.1,.95,.85];const sc=()=>{const i=Math.floor(dispSize),f=dispSize-i;return cam.z*(BS[i]+(BS[Math.min(7,i+1)]-BS[i])*f)};
 const cl=v=>Math.min(S.size-.3,Math.max(.3,v));
 let last=performance.now();
 function frameBody(ts){
