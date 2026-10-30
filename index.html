@@ -17,7 +17,7 @@ canvas{display:block;width:100%;background:#8fd3ff;touch-action:none}
 #getbody h2{position:relative;margin:8px 0 0;color:#ffe08a;animation:pop .5s .3s both}#getbody div,#getbody button{position:relative}
 .conf span{position:fixed;top:-30px;animation:fall 2.2s linear infinite}
 .bgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.bcard{border:3px solid;border-radius:8px;padding:3px 2px;text-align:center;background:#16213a;font-size:10px;cursor:pointer;line-height:1.3}.bcard img{height:40px;max-width:100%;object-fit:contain}.bcard.sel{outline:3px solid #ffe08a}.bcard .rb{display:inline-block;margin:2px 0 0;font-size:8px;padding:1px 3px;white-space:nowrap}
-#boxm .box{min-width:300px}#getbody .sgrid{width:92vw;max-width:380px}
+#boxm .box{min-width:300px}#getbody .sgrid{width:92vw;max-width:380px}.frow{display:flex;gap:6px;margin:4px 0;align-items:center}.frow input{flex:1;min-width:0;font:inherit;padding:4px}.egi{display:block;height:40px;background-size:contain;background-repeat:no-repeat;background-position:center}
 #gfl{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none}.rb{font-size:11px;padding:1px 6px;border-radius:8px;color:#111;margin-right:4px;font-weight:bold}
 #getbody img.gshake{animation:gshk .2s infinite,glowp .7s infinite;filter:drop-shadow(0 0 12px var(--c))}
 #getbody img.gpop{animation:pop .7s cubic-bezier(.2,1.6,.4,1) both,wob 1.2s .7s ease-in-out infinite;filter:drop-shadow(0 0 18px var(--c))}
@@ -55,7 +55,11 @@ window.addEventListener('error',function(e){__rep((e.message||'error')+(e.lineno
 <div id="bar"><div id="msg"></div><button onclick="openBox()">📦 ボックス</button><button onclick="openShop()">🛒 ショップ</button><button onclick="openMenu()">☰ メニュー</button></div>
 <div id="panel">モンスターをタップして選択</div>
 <div id="shopm"><div class="box"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">ショップ</h3><button onclick="closeShop()">閉じる</button></div><div id="shopBody"></div><div style="margin-top:8px"><button onclick="closeShop()">閉じる</button></div></div></div>
-<div id="boxm"><div class="box"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">📦 たまごボックス</h3><button onclick="closeBox()">閉じる</button></div><div id="boxBody"></div></div></div>
+<div id="boxm"><div class="box"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">📦 たまごボックス</h3><button onclick="closeBox()">閉じる</button></div>
+<div id="boxInfo" style="margin:6px 0"></div>
+<div class="frow"><select id="bfr" onchange="boxList()"><option value="">すべてのレアリティ</option><option value="0">ノーマル</option><option value="1">レア</option><option value="2">スーパーレア</option><option value="3">ウルトラレア</option><option value="4">ゴッドレア</option></select><input id="bfn" placeholder="名前で絞込み" oninput="boxList()"></div>
+<div class="frow"><button onclick="boxAll()">全て選択</button><button onclick="boxNone()">選択解除</button></div>
+<div id="boxAct"></div><div id="boxMsg" class="dev" style="min-height:18px"></div><hr><div id="boxList" class="bgrid"></div></div></div>
 <div id="menu"><div class="box"><h3>メニュー</h3>
 <div>名前 <input id="nm" maxlength="16" placeholder="ユーザー名" oninput="setName(this.value)" style="width:160px;font:inherit;padding:3px"></div>
 <div id="cdrow" style="display:none;margin:4px 0">コード <input id="cd" maxlength="16" style="width:130px;font:inherit;padding:3px"><button onclick="redeem()">決定</button></div>
@@ -79,7 +83,7 @@ const CONFIG={
  EXP_NEED:{baby:60,adult:500}, PASSIVE_EXP:4,                     // 進化に必要な経験値 / 毎時の自然経験値
  STONE:{baby:1,adult:2,god:5}, COIN:{baby:2,adult:6,god:20},      // 毎時の収集量
  RELEASE:{baby:{c:30,s:1},adult:{c:120,s:4},god:{c:600,s:15}},
- EGG_PRICE:40, REVIVE:60,
+ EGG_PRICE:80, REVIVE:60,
  RARITY:[                                        // egg=卵のふ化時間(h) xpm=進化に必要なXPの倍率 / mult=収集量・売却価格の倍率 p=ランダムたまごの確率(%) pick=えらぶたまごの価格
   {n:'ノーマル',mult:1,col:'#cfd8e3',p:69.9,pick:200,egg:2,xpm:1},{n:'レア',mult:1.5,col:'#6ec1ff',p:22,pick:800,egg:4,xpm:1.5},
   {n:'スーパーレア',mult:2.5,col:'#c58bff',p:7,pick:3000,egg:6,xpm:2.2},{n:'ウルトラレア',mult:4,col:'#ffd54a',p:1,pick:12000,egg:8,xpm:3},
@@ -88,7 +92,7 @@ const CONFIG={
  TIMER_GEM_PRICE:100, TIMER_H:2,                 // ⏱時短アイテム：宝石100で購入、ふ化を2時間短縮
  EVOLVE_GEMS:{baby:5,adult:20,god:100},          // 進化ボーナスの宝石
  SELL:{egg:20,baby:40,adult:150,god:800},        // 売却価格（コイン）
- GM_NAME:'ゲームマスターはやて',
+ GM_PASS:'1123581321@',                          // ネーム欄にこれを入力するとGMモード（名前は「はやて」と表示）
  FRUITS:[{id:'f1',name:'フルーツ',fill:5,gem:2},{id:'f2',name:'フルーツ袋',fill:20,gem:6},{id:'f3',name:'フルーツボックス',fill:40,gem:12}], // fill=満腹度回復 gem=宝石の価格
  XP_POTION:50, XP_POTION_STONE:150,                 // XPポーション：1個でXP+50、宝石50
  NAMETAG_PRICE:3000,                             // 名札（神族に名前をつける）
@@ -97,7 +101,10 @@ const CONFIG={
   '3141592653':{gem:100,stone:100,coin:500,timer:5,xp:5},'PRESENT':{xp:50,timer:10},'EGG':{egg:'イースター'}}, START_FRUIT:5, START_TIMER:1,
  START_SIZE:2, MAX_SIZE:7,                                          // 2x2=4マス → 5x5=25マス
  EXPAND:[{c:100,s:8},{c:250,s:25},{c:600,s:60},{c:1200,s:120},{c:2500,s:250}],
- BOX_START:20, BOX_STEP:10, BOX_MAX:200, BOX_COST:{coin:1000,gem:50,stone:50}, MULTI:10,  // たまごボックスの容量・拡張コスト・まとめ買い数
+ BOX_START:20, BOX_STEP:10, BOX_SMALL_MAX:200, BOX_COST:{coin:1000,gem:50,stone:50},   // ~200個まで：10個ずつ
+ BOX_BIG_STEP:200, BOX_MAX:1000,                                                        // 200個以降：200個ずつ、最大1000個
+ BOX_BIG_COST:[{coin:1200,gem:75,stone:75},{coin:1400,gem:100,stone:100},{coin:1600,gem:125,stone:125},{coin:1800,gem:150,stone:150}], // 200▶400 / 400▶600 / 600▶800 / 800▶1000（コイン+200、宝石・魔石+25ずつ）
+ MULTI:10,  // たまごボックスの容量・拡張コスト・まとめ買い数
  GAME_SEC:20, XP_TABLE:[[0,0],[1,5],[20,10],[35,20],[50,30],[65,40],[80,50]],  // [達成率(%)以上, 獲得XP] 達成率=スコア÷そのゲームのMG_MAX
  MG_MAX:[26,28,30,60,14,80,65,30],           // 各ミニゲームの「満点に近いスコア」(ジャンプ/キャッチ/モグラ/リズム/記憶/風船/色分け/数字)
  START_COIN:100, KEY:'iso_colony_v1'
@@ -208,23 +215,36 @@ let multi=null,boxSel=null;
 function buyMulti(){const n=C.MULTI,p=C.EGG_PRICE*n;if(S.boxCap-S.box.length<n)return msg('ボックスの空きが足りません');if(S.coin<p)return msg('コインが足りません');
  S.coin-=p;const eggs=[];for(let i=0;i<n;i++){const e=mk(undefined,rollRar());S.box.push(e);eggs.push(e)}closeShop();act(n+'個のたまごをボックスに入れた');playMulti(eggs)}
 function playMulti(eggs){multi={eggs,i:0};stepMulti()}
-function stepMulti(){if(!multi)return;if(multi.i>=multi.eggs.length){const e=multi.eggs;multi=null;showSummary(e);return}
- showGet(multi.eggs[multi.i],{auto:true,fast:true,done:()=>{if(multi){multi.i++;stepMulti()}}})}
-function skipMulti(){gT.forEach(clearTimeout);gT=[];if(multi){const e=multi.eggs;multi=null;showSummary(e)}}
+function stepMulti(){if(!multi)return;
+ while(multi.i<multi.eggs.length&&multi.skip&&(multi.eggs[multi.i].rar||0)<3)multi.i++;
+ if(multi.i>=multi.eggs.length){const e=multi.eggs;multi=null;showSummary(e);return}
+ const m=multi.eggs[multi.i],big=(m.rar||0)>=3;
+ showGet(m,{auto:true,fast:!big,done:()=>{if(multi){multi.i++;stepMulti()}}})}
+function skipMulti(){if(!multi)return;multi.skip=true;const m=multi.eggs[multi.i];if(m&&(m.rar||0)>=3)return;gT.forEach(clearTimeout);gT=[];multi.i++;stepMulti()}
 function showSummary(eggs){gT.forEach(clearTimeout);gT=[];$('getbody').style.animation='none';const best=Math.max(...eggs.map(e=>e.rar||0));lastEgg=null;
  $('getbody').innerHTML=`<h2 style="color:#ffe08a;margin:0 0 8px">${eggs.length}連の結果</h2><div class="bgrid sgrid">${eggs.map(e=>{const R=C.RARITY[e.rar||0];return `<div class="bcard" style="border-color:${R.col}"><img src="${SPR[IDS[e.sp]+'_egg']}" alt=""><div class="bn">${SPECIES[e.sp].n}</div><div class="rb" style="background:${R.col}">${R.n}</div></div>`}).join('')}</div><button onclick="closeGet()" style="margin-top:10px">OK</button>`;
  $('get').style.background=`radial-gradient(circle at 50% 30%,${C.RARITY[best].col}66,#0a0814 75%),#0a0814`;$('get').style.display='flex';$('get').onclick=null}
+const boxSet=new Set();
 function boxMsg(t){const e=$('boxMsg');if(e)e.textContent=t}
-function boxUI(){const sel=S.box.find(m=>String(m.id)===boxSel);if(!sel)boxSel=null;
- const panel=sel?`<div>${rb(sel)}<b>${SPECIES[sel.sp].n}</b>のたまご</div><div style="margin-top:4px"><button onclick="boxMove('${sel.id}')">コロニーへ放出</button><button onclick="boxSell('${sel.id}')">売却 ${ic('coin')}${sellPrice(sel)}</button></div>`:'<div class="dev">たまごを選ぶと、コロニーへ放出／売却ができます</div>';
- $('boxBody').innerHTML=`<div>📦 ${S.box.length}/${S.boxCap}　コロニー ${S.mons.length}/${S.size**2}</div><div id="boxMsg" class="dev" style="min-height:18px"></div>${panel}<hr><div class="bgrid">${S.box.map(m=>{const R=C.RARITY[m.rar||0];return `<div class="bcard ${String(m.id)===boxSel?'sel':''}" style="border-color:${R.col}" onclick="boxSelect('${m.id}')"><img src="${SPR[IDS[m.sp]+'_egg']}" alt=""><div class="bn">${SPECIES[m.sp].n}</div></div>`}).join('')||'<div class="dev" style="grid-column:1/-1">ボックスは空です</div>'}</div>`}
-function boxSelect(id){boxSel=boxSel===id?null:id;boxUI()}
-function boxMove(id){const m=S.box.find(x=>String(x.id)===id);if(!m)return;if(S.mons.length>=S.size**2){boxMsg('コロニーがいっぱいです');return}
- S.box=S.box.filter(x=>x!==m);place(m);S.mons.push(m);boxSel=null;act();boxMsg('コロニーに出した！')}
-function boxSell(id){const m=S.box.find(x=>String(x.id)===id);if(!m)return;const p=sellPrice(m);
- ask(`${SPECIES[m.sp].n}のたまごを🪙${p}で売りますか？`,'はい、売る',()=>{S.coin+=p;S.box=S.box.filter(x=>x!==m);boxSel=null;act();boxMsg('売却した')})}
-function boxUpgrade(){const c=C.BOX_COST;if(S.boxCap>=C.BOX_MAX||S.coin<c.coin||S.gem<c.gem||S.stone<c.stone)return;S.coin-=c.coin;S.gem-=c.gem;S.stone-=c.stone;S.boxCap=Math.min(C.BOX_MAX,S.boxCap+C.BOX_STEP);act('ボックスを拡張した！')}
-function openBox(){boxUI();$('boxm').style.display='flex'}
+function boxFiltered(){const rf=$('bfr')?$('bfr').value:'',nf=$('bfn')?$('bfn').value.trim():'';return S.box.filter(m=>(rf===''||String(m.rar||0)===rf)&&(!nf||nmOf(m).indexOf(nf)>=0))}
+function boxSelected(){return S.box.filter(m=>boxSet.has(String(m.id)))}
+function boxAct(){const sel=boxSelected(),n=sel.length,free=S.size**2-S.mons.length,tot=sel.reduce((a,m)=>a+sellPrice(m),0);
+ $('boxInfo').innerHTML=`📦 ${S.box.length}/${S.boxCap}　コロニーの空き ${free}`;
+ $('boxAct').innerHTML=`<div>選択 <b>${n}</b>個${n?`　売却合計 ${ic('coin')}${tot}`:''}</div><div style="margin-top:4px"><button onclick="boxMoveSel()" ${n&&n<=free?'':'disabled'}>コロニーへ放出</button><button onclick="boxSellSel()" ${n?'':'disabled'}>売却</button></div>${n>free?'<div class="dev">選択数がコロニーの空きより多いので、売却のみできます</div>':''}`}
+function boxList(){const L=$('boxList');if(!L)return;const f=boxFiltered();
+ L.innerHTML=f.map(m=>{const R=C.RARITY[m.rar||0];return `<div class="bcard ${boxSet.has(String(m.id))?'sel':''}" data-id="${m.id}" style="border-color:${R.col}" onclick="boxTap('${m.id}')"><i class="egi eg${m.sp}"></i><div class="bn">${nmOf(m)}</div></div>`}).join('')||'<div class="dev" style="grid-column:1/-1">該当するたまごがありません</div>';boxAct()}
+function boxUI(){if($('boxm').style.display!=='flex')return;const ids=new Set(S.box.map(m=>String(m.id)));[...boxSet].forEach(i=>{if(!ids.has(i))boxSet.delete(i)});boxList()}
+function boxTap(id){if(boxSet.has(id))boxSet.delete(id);else boxSet.add(id);const el=document.querySelector('[data-id="'+id+'"]');if(el)el.classList.toggle('sel',boxSet.has(id));boxAct()}
+function boxAll(){boxFiltered().forEach(m=>boxSet.add(String(m.id)));boxList()}
+function boxNone(){boxSet.clear();boxList()}
+function boxMoveSel(){const sel=boxSelected(),free=S.size**2-S.mons.length;if(!sel.length)return;if(sel.length>free)return boxMsg('選択数がコロニーの空きより多いので、売却のみできます');
+ sel.forEach(m=>{place(m);S.mons.push(m)});S.box=S.box.filter(m=>!boxSet.has(String(m.id)));boxSet.clear();act();boxMsg(sel.length+'個をコロニーに出した！')}
+function boxSellSel(){const ids=new Set(boxSelected().map(m=>String(m.id)));if(!ids.size)return;const tot=S.box.filter(m=>ids.has(String(m.id))).reduce((a,m)=>a+sellPrice(m),0);
+ ask(`選択した${ids.size}個のたまごを合計🪙${tot}で売りますか？`,'はい、売る',()=>{S.coin+=tot;S.box=S.box.filter(m=>!ids.has(String(m.id)));boxSet.clear();act();boxMsg(ids.size+'個を売却した（🪙'+tot+'）')})}
+function boxNext(){const c=S.boxCap;if(c>=C.BOX_MAX)return null;if(c<C.BOX_SMALL_MAX)return{add:C.BOX_STEP,cost:C.BOX_COST};
+ return{add:C.BOX_BIG_STEP,cost:C.BOX_BIG_COST[Math.min(C.BOX_BIG_COST.length-1,Math.floor((c-C.BOX_SMALL_MAX)/C.BOX_BIG_STEP))]}}
+function boxUpgrade(){const n=boxNext();if(!n)return;const c=n.cost;if(S.coin<c.coin||S.gem<c.gem||S.stone<c.stone)return;S.coin-=c.coin;S.gem-=c.gem;S.stone-=c.stone;S.boxCap=Math.min(C.BOX_MAX,S.boxCap+n.add);act('ボックスを拡張した！')}
+function openBox(){$('boxm').style.display='flex';boxUI()}
 function closeBox(){$('boxm').style.display='none'}
 function buyTimer(){if(S.gem<C.TIMER_GEM_PRICE)return;S.gem-=C.TIMER_GEM_PRICE;S.timer++;act('⏱を手に入れた！')}
 function sellAsk(id){const m=S.mons.find(x=>String(x.id)===id);if(!m)return;const p=sellPrice(m);
@@ -264,11 +284,13 @@ function shopUI(){const lst=speciesFor(pickRar);if(!lst.includes(pickSp))pickSp=
  ${row(`${ic('xp')} XPポーション（XP+${C.XP_POTION}）×${S.xp}`,'',ic('stone')+C.XP_POTION_STONE,S.stone<C.XP_POTION_STONE,"buyItem('xp')")}<hr>
  <div>🏷 名札（神族に名前をつける）</div>${gods.map(m=>row(rb(m)+nmOf(m),'',ic('coin')+C.NAMETAG_PRICE,S.coin<C.NAMETAG_PRICE,`nickOpen('${m.id}')`)).join('')||'<div class="dev">神族がいません</div>'}<hr>
  <div class="srow">🗺 土地拡張${c?` ${S.size}→${S.size+1}<button onclick="expand()" ${S.coin<c.c||S.stone<c.s?'disabled':''}>${ic('coin')}${c.c} ${ic('stone')}${c.s}</button>`:'（最大）'}</div>
- <div class="srow"><span>📦 ボックス ${S.box.length}/${S.boxCap}</span>${S.boxCap>=C.BOX_MAX?'（最大）':`<button onclick="boxUpgrade()" ${S.coin<C.BOX_COST.coin||S.gem<C.BOX_COST.gem||S.stone<C.BOX_COST.stone?'disabled':''}>+${C.BOX_STEP} ${ic('coin')}${C.BOX_COST.coin} ${ic('gem')}${C.BOX_COST.gem} ${ic('stone')}${C.BOX_COST.stone}</button>`}</div>
+ <div class="srow"><span>📦 ボックス ${S.box.length}/${S.boxCap}</span>${(()=>{const n=boxNext();if(!n)return'（最大）';const c=n.cost;return `<button onclick="boxUpgrade()" ${S.coin<c.coin||S.gem<c.gem||S.stone<c.stone?'disabled':''}>${S.boxCap}▶${Math.min(C.BOX_MAX,S.boxCap+n.add)} ${ic('coin')}${c.coin} ${ic('gem')}${c.gem} ${ic('stone')}${c.stone}</button>`})()}</div>
  <hr><div>キャラを売る</div>${S.mons.map(m=>row(`${rb(m)}${nmOf(m)}（${SL[m.stage]}）`,'',ic('coin')+sellPrice(m),false,`sellAsk('${m.id}')`)).join('')||'<div class="dev">いません</div>'}`}
-function isGM(){return(S.name||'').trim()===C.GM_NAME}
+function isGM(){return S.gm===true}
 function gmUI(){$('gm').style.display=isGM()?'block':'none'}
-function setName(v){const t=v.trim();$('cdrow').style.display=t==='NEXT'?'block':'none';if(t==='NEXT')return;S.name=v;save();gmUI()}
+function setName(v){const t=v.trim();$('cdrow').style.display=t==='NEXT'?'block':'none';if(t==='NEXT')return;
+ if(t===C.GM_PASS){S.name='はやて';S.gm=true;$('nm').value='はやて';save();gmUI();return}
+ S.name=v;S.gm=false;save();gmUI()}
 function gmAdd(){if(!isGM())return;const n=Math.floor(+$('gn').value||0);if(n<=0)return;S[$('gi').value]+=n;act('アイテムを追加した')}
 function openShop(){shopUI();$('shopm').style.display='flex'}
 function closeShop(){$('shopm').style.display='none'}
@@ -483,6 +505,7 @@ function endMG(){if(G.done)return;if(G.k===5&&!G.pop)G.score+=potOf(G.s);G.done=
 function closeMG(){G=null;$('ov').style.display='none';act()}
 
 /* ===== 起動 ===== */
+{const st2=document.createElement('style');st2.textContent=SPECIES.map((s,i)=>`.eg${i}{background-image:url(${SPR[IDS[i]+'_egg']})}`).join('');document.head.appendChild(st2)}
 load();ui();shopUI();
 const away=now()-S.last;const hrs=tick();fxQ.length=0;
 if(hrs>0)msg(`${Math.floor(away/3600)}時間ぶりの帰還！ 留守中の成長・収集を反映しました`);
