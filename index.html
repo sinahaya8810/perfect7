@@ -95,7 +95,8 @@ const CONFIG={
  GM_PASS:'1123581321@',                          // ネーム欄にこれを入力するとGMモード（名前は「はやて」と表示）
  FRUITS:[{id:'f1',name:'フルーツ',fill:50,gem:2},{id:'f2',name:'フルーツ袋',fill:100,gem:6},{id:'f3',name:'フルーツボックス',fill:200,gem:12}], // fill=満腹度回復 gem=宝石の価格
  XP_POTION:50, XP_POTION_STONE:150,                 // XPポーション：1個でXP+50、宝石50
- BASKET:{fill:100,coin:1000,gem:30},                 // フルーツの詰め合わせ：コロニー全員の満腹度+fill
+ BASKET:{fill:100,coin:1000,gem:30},
+ COOK_FILL:100,                                  // トントン(神族)を「調理する」と、ほかの全員の満腹度がこれだけ回復                 // フルーツの詰め合わせ：コロニー全員の満腹度+fill
  NAMETAG_PRICE:3000,                             // 名札（神族に名前をつける）
  CHEST_H:12, CHEST:{coin:100,stone:10,gem:10,fruit:10}, // 宝箱の出現間隔(時間)と中身
  CODES:{                                          // コード(大文字)：報酬。egg=その種族のたまごをもらう。どれも1度だけ
@@ -122,7 +123,7 @@ const SPECIES=[
  {n:'メカ67号',col:'#4aa8ff',e:['🤖','🤖','🤖'],tier:3},{n:'オーロラドラゴン',col:'#7ad9e8',e:['🐲','🐲','🐉'],tier:3},
  {n:'チュライム',col:'#5aa9ff',e:['💧','🤴','👼'],tier:1},{n:'ホウオウ',col:'#ffb347',e:['🐤','🦅','🦅'],tier:1},{n:'ポチ太郎',col:'#b9743f',e:['🐶','🐕','🐺'],tier:1},
  {n:'ホエル',col:'#4aa8ff',e:['🐳','🐋','🐋'],tier:1},{n:'トレント',col:'#6b8e3a',e:['🌱','🌳','🌳'],tier:1},{n:'マーシュド',col:'#9b5de5',e:['🍄','🍄','🍄'],tier:1},{n:'モンピ',col:'#9a6b4f',e:['🐵','🐒','🐒'],tier:1},
- {n:'レぺリオ',col:'#4fd1c5',e:['🦎','🦎','🦎'],tier:2},{n:'トントン',col:'#ff9ec7',e:['🐷','🐗','🐖'],tier:2},{n:'パオーシャ',col:'#7a9cc6',e:['🐘','🐘','🐘'],tier:2},
+ {n:'レぺリオ',col:'#4fd1c5',e:['🦎','🦎','🦎'],tier:2},{n:'トントン',col:'#ff9ec7',e:['🐷','🐗','🐖'],tier:2,cook:true},{n:'パオーシャ',col:'#7a9cc6',e:['🐘','🐘','🐘'],tier:2},
  {n:'ダークドラゴン',col:'#2c3e66',e:['🐲','🐉','🐉'],tier:2},{n:'ヌエ',col:'#b8860b',e:['🐭','🦁','🦁'],tier:2},{n:'ルーンパンサー',col:'#4a5a9a',e:['🐱','🐈','🐆'],tier:2},
  {n:'ワタツミ',col:'#3a8fe0',e:['🐟','🐉','🐉'],tier:2},{n:'コスモオウル',col:'#6a3fa0',e:['🦉','🦉','🦉'],tier:2},{n:'クリスナイン',col:'#b78cf0',e:['🦊','🦊','🦊'],tier:2},
  {n:'イースター',col:'#ff9ec7',e:['🐰','🐰','🐰'],tier:-1,bring:{n:1,every:2},inc:{coin:0,stone:0},note:'2時間ごとに⏱だけを持ってくる'},
@@ -262,6 +263,10 @@ function boxNext(){const c=S.boxCap;if(c>=C.BOX_MAX)return null;return{add:C.BOX
 function boxUpgrade(){const n=boxNext();if(!n)return;const c=n.cost;if(S.coin<c.coin||S.gem<c.gem||S.stone<c.stone)return;S.coin-=c.coin;S.gem-=c.gem;S.stone-=c.stone;S.boxCap=Math.min(C.BOX_MAX,S.boxCap+n.add);act('ボックスを拡張した！')}
 function openBox(){$('boxm').style.display='flex';boxUI()}
 function closeBox(){$('boxm').style.display='none'}
+function cook(){const m=cur();if(!m||m.dead||m.stage!=='god'||!SPECIES[m.sp].cook)return;const nm=nmOf(m);
+ const t=S.mons.filter(x=>x!==m&&!x.dead&&x.stage!=='egg');if(!t.length)return msg('ほかに満腹度を回復できるキャラがいません');
+ S.mons=S.mons.filter(x=>x!==m);sel=null;t.forEach(x=>{x.hunger=Math.min(C.HUNGER_MAX,x.hunger+C.COOK_FILL);if(x.hunger>0)x.starve=0;fxQ.push({m:x,k:'egg'})});
+ act(`${nm}を調理した！ ${t.length}匹の満腹度が+${C.COOK_FILL}回復`)}
 function buyBasket(){const B=C.BASKET;if(S.coin<B.coin||S.gem<B.gem)return;const t=S.mons.filter(m=>!m.dead&&m.stage!=='egg');if(!t.length)return msg('満腹度を回復できるキャラがいません');
  ask(`コロニーの${t.length}匹の満腹度を+${B.fill}回復します（🪙${B.coin}・宝石${B.gem}）`,'はい、使う',()=>{S.coin-=B.coin;S.gem-=B.gem;t.forEach(m=>{m.hunger=Math.min(C.HUNGER_MAX,m.hunger+B.fill);if(m.hunger>0)m.starve=0});act('全員の満腹度が回復した！')})}
 function buyTimer(){if(S.gem<C.TIMER_GEM_PRICE)return;S.gem-=C.TIMER_GEM_PRICE;S.timer++;act('⏱を手に入れた！')}
@@ -286,7 +291,7 @@ function ui(){hud();
   else{h+=`満腹 <span class="bar"><i style="width:${Math.min(100,m.hunger/C.HUNGER_MAX*100)}%;background:#e5484d"></i></span> ${m.hunger}/${C.HUNGER_MAX}${m.hunger===0&&!m.dead?`（飢餓 ${m.starve}/${C.DEATH_H}h・アイテムなし）`:''}<br>
   経験 <span class="bar"><i style="width:${need?m.exp/need*100:100}%;background:#b48cff"></i></span> ${need?m.exp+'/'+need+'（次: '+SL[ST[ST.indexOf(m.stage)+1]]+'）':'MAX'}<br>`+
   (m.dead?`<button onclick="revive()" ${S.stone<C.REVIVE?'disabled':''}>蘇生（${ic('stone')}${C.REVIVE}）</button>`:
-  `${C.FRUITS.map((f,i)=>`<button onclick="feed(${i})" ${S[f.id]<1?'disabled':''}>${ic(f.id)}×${S[f.id]}</button>`).join('')}<button onclick="usePotion()" ${S.xp<1||m.stage==='god'?'disabled':''}>${ic('xp')}×${S.xp}</button><button onclick="startMG()">ミニゲーム</button>`)}
+  `${C.FRUITS.map((f,i)=>`<button onclick="feed(${i})" ${S[f.id]<1?'disabled':''}>${ic(f.id)}×${S[f.id]}</button>`).join('')}<button onclick="usePotion()" ${S.xp<1||m.stage==='god'?'disabled':''}>${ic('xp')}×${S.xp}</button><button onclick="startMG()">ミニゲーム</button>${(SPECIES[m.sp].cook&&m.stage==='god')?'<button onclick="cook()">🍳 調理する</button>':''}`)}
   h+=`<div class="dev">${bringInfo(m)}</div>`}
  $('panel').innerHTML=h}
 let pickSp=0,pickRar=0;
