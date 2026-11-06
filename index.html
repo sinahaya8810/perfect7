@@ -8,7 +8,7 @@ body{margin:0;background:#1b2a3a;color:#fff;font-family:"Hiragino Sans","Meiryo"
 canvas{display:block;width:100%;background:#8fd3ff;touch-action:none}
 #zoom{position:absolute;right:8px;top:8px}#zoom button{width:40px;padding:6px 0}
 #hud{position:absolute;left:8px;top:8px;background:#5a3d27e0;border:3px solid #3a2616;border-radius:6px;padding:6px 10px;font-size:14px;line-height:1.6}
-#bar{width:100%;max-width:800px;display:flex;align-items:center;box-sizing:border-box;padding-right:8px}#nick{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:12}#nick .box{background:#2a3f57;border:3px solid #fff;border-radius:10px;padding:16px;text-align:center}
+#bar{width:100%;max-width:800px;display:flex;flex-wrap:wrap;align-items:center;box-sizing:border-box;padding-right:8px}#bar #msg{flex:1 1 90px}#nick{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:12}#nick .box{background:#2a3f57;border:3px solid #fff;border-radius:10px;padding:16px;text-align:center}
 #cf{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:11}#cf .box{background:#2a3f57;border:3px solid #fff;border-radius:10px;padding:16px;text-align:center}
 #get{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;z-index:10;text-align:center;overflow:hidden}
 #getbody{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -18,6 +18,24 @@ canvas{display:block;width:100%;background:#8fd3ff;touch-action:none}
 .conf span{position:fixed;top:-30px;animation:fall 2.2s linear infinite}
 .bgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.bcard{border:3px solid;border-radius:8px;padding:3px 2px;text-align:center;background:#16213a;font-size:10px;cursor:pointer;line-height:1.3}.bcard img{height:40px;max-width:100%;object-fit:contain}.bcard.sel{outline:3px solid #ffe08a}.bcard .rb{display:inline-block;margin:2px 0 0;font-size:8px;padding:1px 3px;white-space:nowrap}
 #boxm .box{min-width:300px}#getbody .sgrid{width:92vw;max-width:380px}.frow{display:flex;gap:6px;margin:4px 0;align-items:center}.frow input{flex:1;min-width:0;font:inherit;padding:4px}.egi{display:block;height:40px;background-size:contain;background-repeat:no-repeat;background-position:center}
+#dexm .box{min-width:300px;max-width:92vw}
+.dq,.dlock{display:flex;align-items:center;justify-content:center;font-weight:bold;border-radius:8px;height:40px}
+.dlock{color:#456;font-size:24px;background:#0e1527}
+.dq{font-size:26px;color:#ffe08a;background:#2b2450;animation:dqp 1s ease-in-out infinite}
+@keyframes dqp{0%,100%{transform:scale(1);box-shadow:0 0 4px #ffe08a88}50%{transform:scale(1.12) rotate(-4deg);box-shadow:0 0 16px #ffe08a}}
+.dbadge{position:absolute;top:-6px;right:-4px;background:#ff3b5c;color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:11px;line-height:16px;font-weight:bold;text-align:center;animation:dqp 1s infinite}
+button .dbadge{position:static;display:inline-block;margin-left:2px}.dtile{position:relative}
+.dtitle{font-size:18px;font-weight:bold;margin:2px 0 6px;color:#ffe08a}
+.dslot{display:flex;gap:10px;align-items:center;background:#16213a;border:2px solid #3b4a6a;border-radius:8px;padding:6px;margin:6px 0}
+.dslot.dclaim{border-color:#ffe08a;cursor:pointer;animation:dqg 1.2s infinite}@keyframes dqg{50%{box-shadow:0 0 14px #ffe08aaa}}
+.dimg{width:76px;flex:none;text-align:center}.dimg img{max-width:76px;max-height:76px;object-fit:contain}.dimg .dq,.dimg .dlock{height:64px;font-size:34px}
+.dtx{flex:1;min-width:0;line-height:1.5}.dst{font-size:11px;color:#8fb4ff}.dnm{font-weight:bold}.dds{font-size:12px;color:#cfd8e8}.dtap{color:#ffe08a}
+.dxflash{animation:dxf .6s}@keyframes dxf{0%{background:#fff}100%{background:#16213a}}
+.dxp{position:fixed;z-index:20;pointer-events:none;font-size:18px;animation:dxfly .9s ease-out forwards}
+@keyframes dxfly{from{transform:translate(-50%,-50%) scale(.5);opacity:1}to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.2);opacity:0}}
+.dxt{position:fixed;z-index:21;pointer-events:none;font-weight:bold;font-size:22px;color:#ffe08a;text-shadow:0 0 6px #000;animation:dxrise 1.1s ease-out forwards}
+@keyframes dxrise{from{transform:translate(-50%,0);opacity:1}to{transform:translate(-50%,-50px);opacity:0}}
+#info{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:11}#info .box{background:#2a3f57;border:3px solid #fff;border-radius:10px;padding:16px;text-align:center}.soon{color:#ffe08a;font-size:10px}
 #gfl{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none}.rb{font-size:11px;padding:1px 6px;border-radius:8px;color:#111;margin-right:4px;font-weight:bold}
 #getbody img.gshake{animation:gshk .2s infinite,glowp .7s infinite;filter:drop-shadow(0 0 12px var(--c))}
 #getbody img.gpop{animation:pop .7s cubic-bezier(.2,1.6,.4,1) both,wob 1.2s .7s ease-in-out infinite;filter:drop-shadow(0 0 18px var(--c))}
@@ -26,9 +44,9 @@ canvas{display:block;width:100%;background:#8fd3ff;touch-action:none}
 .mys{width:100px;height:130px;border-radius:50% 50% 48% 48%/62% 62% 38% 38%;background:radial-gradient(circle at 35% 30%,#8a76c4,#2a2145 70%);border:3px solid #ffe08a;box-shadow:0 0 22px #ffe08acc;display:flex;align-items:center;justify-content:center;font-size:52px;color:#ffe08a;font-weight:bold;position:relative}
 #getbody .mys.gshake{animation:gshk .2s infinite,glowp .7s infinite}
 @keyframes spin{to{transform:rotate(360deg)}}@keyframes pop{from{transform:scale(0) rotate(-30deg)}to{transform:scale(1)}}@keyframes wob{50%{transform:rotate(6deg) scale(1.06)}}@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
-#shopm .box,#boxm .box{max-height:88vh;overflow:auto;min-width:290px;max-width:92vw}.srow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0;font-size:14px}.srow select{max-width:130px}
+#shopm .box,#boxm .box,#dexm .box{max-height:88vh;overflow:auto;min-width:290px;max-width:92vw}.srow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0;font-size:14px}.srow select{max-width:130px}
 #msg{flex:1}
-#menu,#shopm,#boxm{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:8}#menu .box,#shopm .box,#boxm .box{background:#2a3f57;border:3px solid #fff;border-radius:10px;padding:14px;min-width:270px;line-height:1.9}#menu h3{margin:0 0 6px}.danger{background:#c0392b;border-color:#6e1d14}
+#menu,#shopm,#boxm,#dexm{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:8}#menu .box,#shopm .box,#boxm .box,#dexm .box{background:#2a3f57;border:3px solid #fff;border-radius:10px;padding:14px;min-width:270px;line-height:1.9}#menu h3{margin:0 0 6px}.danger{background:#c0392b;border-color:#6e1d14}
 #cf{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:11}#cf .box{background:#2a3f57;border:3px solid #fff;border-radius:10px;padding:16px;text-align:center}
 #get{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;z-index:10;text-align:center;overflow:hidden}
 #getbody{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -52,7 +70,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
 if(d.textContent.indexOf(m)<0&&d.textContent.length<400)d.textContent+=m+'\n'};
 window.addEventListener('error',function(e){__rep((e.message||'error')+(e.lineno?' (行'+e.lineno+')':''))});</script>
 <div id="wrap"><canvas id="cv" width="640" height="360"></canvas><div id="boot" style="position:absolute;left:0;right:0;top:35%;text-align:center;color:#12324a;font:14px/1.6 sans-serif;padding:0 24px;pointer-events:none">読み込み中…<br><small>この表示が消えないときは、ファイルが途中で切れています。GitHubには「Upload files」でファイルごとアップロードしてください。</small></div><div id="zoom"><button onclick="zoom(1.3)">＋</button><button onclick="zoom(.77)">－</button><br><button onclick="focusSel()">🔍</button><button onclick="zoom(0)">全体</button></div></div>
-<div id="bar"><div id="msg"></div><button onclick="openBox()">📦 ボックス</button><button onclick="openShop()">🛒 ショップ</button><button onclick="openMenu()">☰ メニュー</button></div>
+<div id="bar"><div id="msg"></div><button onclick="openBox()">📦 ボックス</button><button id="dexbtn" onclick="openDex()">📖 図鑑</button><button id="colbtn" onclick="switchCol()" style="display:none">🌙 第2コロニーへ</button><button onclick="questInfo()">🚪 クエスト <small class="soon">近日公開</small></button><button onclick="openShop()">🛒 ショップ</button><button onclick="openMenu()">☰ メニュー</button></div>
 <div id="panel">モンスターをタップして選択</div>
 <div id="shopm"><div class="box"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">ショップ</h3><button onclick="closeShop()">閉じる</button></div><div id="shopBody"></div><div style="margin-top:8px"><button onclick="closeShop()">閉じる</button></div></div></div>
 <div id="boxm"><div class="box"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">📦 たまごボックス</h3><button onclick="closeBox()">閉じる</button></div>
@@ -69,6 +87,8 @@ window.addEventListener('error',function(e){__rep((e.message||'error')+(e.lineno
 <div class="dev">アイテム追加 <select id="gi"><option value="coin">コイン</option><option value="stone">魔石</option><option value="gem">宝石</option><option value="timer">⏱</option><option value="xp">XPポーション</option><option value="f1">フルーツ</option><option value="f2">フルーツ袋</option><option value="f3">フルーツボックス</option></select> <input id="gn" type="number" value="100" style="width:70px"><button onclick="gmAdd()">追加</button></div></div>
 <div class="dev" style="margin-top:8px"><button onclick="exportData()">💾 ファイルに保存</button> <button onclick="$('imp').click()">📂 読み込み</button><input id="imp" type="file" accept=".json,application/json" style="display:none" onchange="importData(this)"></div>
 <div style="margin-top:10px"><button class="danger" onclick="delData()">データをリセット</button><button onclick="closeMenu()">閉じる</button></div></div></div>
+<div id="dexm"><div class="box"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">📖 図鑑</h3><button onclick="closeDex()">閉じる</button></div><div id="dexInfo" class="dev" style="margin:4px 0"></div><div id="dexDetail"></div><hr><div class="dev" style="margin-bottom:6px">たまごをタップすると、進化後のすがたが見られます</div><div id="dexGrid" class="bgrid"></div></div></div>
+<div id="info"><div class="box"><div style="font-size:44px">🚪</div><h3 style="margin:4px 0">クエスト　近日公開！</h3><div style="max-width:250px;line-height:1.6">キャラクターが敵と戦うクエストを準備中です。<br>もう少しだけ、お待ちください！</div><button style="margin-top:10px" onclick="$('info').style.display='none'">とじる</button></div></div>
 <div id="get"><div id="getbody"></div><div id="gfl"></div></div>
 <div id="cf"><div class="box"><div id="cft" style="margin-bottom:10px;max-width:260px"></div><button id="cfy" class="danger"></button><button onclick="$('cf').style.display='none'">いいえ</button></div></div>
 <div id="nick"><div class="box"><div style="margin-bottom:8px;max-width:250px">神族に名前をつけます（3000コイン）<br>名前は8文字まで</div><input id="nki" maxlength="8" style="font:inherit;padding:4px;width:180px"><div style="margin-top:8px"><button onclick="nickOk()">決定</button><button onclick="$('nick').style.display='none'">やめる</button></div></div></div>
@@ -96,13 +116,15 @@ const CONFIG={
  FRUITS:[{id:'f1',name:'フルーツ',fill:50,gem:2},{id:'f2',name:'フルーツ袋',fill:100,gem:6},{id:'f3',name:'フルーツボックス',fill:200,gem:12}], // fill=満腹度回復 gem=宝石の価格
  XP_POTION:50, XP_POTION_STONE:150,                 // XPポーション：1個でXP+50、宝石50
  BASKET:{fill:100,coin:1000,gem:30},
+ COLONY2_COST:{coin:20000,gem:1000,stone:1000},   // 第2コロニー（夜）の購入費用
+ DEX_REWARD:{egg:50,baby:100,adult:500,god:1000},     // 図鑑に登録したときのコイン（たまご/あかちゃん/せいたい/神族）
  COOK_FILL:100,                                  // トントン(神族)を「調理する」と、ほかの全員の満腹度がこれだけ回復                 // フルーツの詰め合わせ：コロニー全員の満腹度+fill
  NAMETAG_PRICE:3000,                             // 名札（神族に名前をつける）
- CHEST_H:12, CHEST:{coin:100,stone:10,gem:10,fruit:10}, // 宝箱の出現間隔(時間)と中身
+ CHEST_H:12, CHEST:{coin:1000,stone:100,gem:100,fruit:100}, // 宝箱の出現間隔(時間)と中身
  CODES:{                                          // コード(大文字)：報酬。egg=その種族のたまごをもらう。どれも1度だけ
   '3141592653':{gem:100,stone:100,coin:500,timer:5,xp:5},'PRESENT':{xp:50,timer:10},'EGG':{egg:'イースター'}}, START_FRUIT:5, START_TIMER:1,
- START_SIZE:2, MAX_SIZE:7,                                          // 2x2=4マス → 5x5=25マス
- EXPAND:[{c:100,s:8},{c:250,s:25},{c:600,s:60},{c:1200,s:120},{c:2500,s:250}],
+ START_SIZE:2, MAX_SIZE:8,                                          // 2x2=4マス → 5x5=25マス
+ EXPAND:[{c:100,s:8},{c:250,s:25},{c:600,s:60},{c:1200,s:120},{c:2500,s:250},{c:5000,s:500}],
  BOX_START:20, BOX_STEP:10, BOX_MAX:1000,           // たまごボックス：10個ずつ拡張、最大1000個
  BOX_TIER_COST:[{coin:1000,gem:50,stone:50},{coin:1200,gem:75,stone:75},{coin:1400,gem:100,stone:100},{coin:1600,gem:125,stone:125},{coin:1800,gem:150,stone:150}], // 1回(+10)の費用。容量200ごとに値上げ（〜199 / 200〜 / 400〜 / 600〜 / 800〜）
  MULTI:10,  // たまごボックスの容量・拡張コスト・まとめ買い数
@@ -171,7 +193,7 @@ function mk(sp,rar){const m={id:Math.random(),rar:rar||0,sp:sp??pickSpecies(rar|
 function place(m){m.gx=rnd(.4,S?S.size-.4:1.6);m.gy=rnd(.4,S?S.size-.4:1.6);m.tx=m.gx;m.ty=m.gy;m.w=rnd(1,4);m.ph=rnd(0,6);m.mode="idle";m.jt=0;m.flash=0}
 function load(){try{S=JSON.parse(localStorage.getItem(C.KEY))}catch(e){}
  if(!S){S={coin:C.START_COIN,stone:0,size:C.START_SIZE,mons:[],last:now(),acc:0};S.mons.push(mk(0))}
- S.box=S.box||[];S.boxCap=S.boxCap||C.BOX_START;S.gem=S.gem||0;S.xp=S.xp||0;S.timer=S.timer||0;if(!S.starter){S.starter=1;S.timer+=C.START_TIMER}S.f1=S.f1==null?C.START_FRUIT:S.f1;S.f2=S.f2||0;S.f3=S.f3||0;S.codes=S.codes||{};if(!S.chestNext)S.chestNext=now()+C.CHEST_H*3600;S.timer=S.timer||0;S.name=S.name||'';S.mons.forEach(place);dispSize=S.size}
+ S.box=S.box||[];S.dex=S.dex||{};S.boxCap=S.boxCap||C.BOX_START;S.gem=S.gem||0;S.xp=S.xp||0;S.timer=S.timer||0;if(!S.starter){S.starter=1;S.timer+=C.START_TIMER}S.f1=S.f1==null?C.START_FRUIT:S.f1;S.f2=S.f2||0;S.f3=S.f3||0;S.codes=S.codes||{};if(!S.chestNext)S.chestNext=now()+C.CHEST_H*3600;S.timer=S.timer||0;S.name=S.name||'';S.mons.forEach(place);dispSize=S.size}
 function save(){if(wiping)return;try{localStorage.setItem(C.KEY,JSON.stringify(S))}catch(e){}}
 const msg=t=>$('msg').textContent=t;
 
@@ -189,8 +211,8 @@ function hourStep(m){
  if(m.hunger>0&&m.stage!=='god'){m.exp+=C.PASSIVE_EXP;evo(m)}
 }
 function advance(sec){S.acc+=sec;const n=Math.floor(S.acc/3600);S.acc-=n*3600;
- for(let i=0;i<n;i++)S.mons.forEach(hourStep);return n}
-function tick(){const t=now();const n=advance(t-S.last);S.last=t;chestCheck(t);save();hud();if(n){ui();shopUI()}return n}
+ for(let i=0;i<n;i++){S.mons.forEach(hourStep);if(S.alt)S.alt.mons.forEach(hourStep)}return n}
+function tick(){const t=now();const n=advance(t-S.last);S.last=t;chestCheck(t);if(dexSync())dexUI();save();hud();if(n){ui();shopUI()}return n}
 
 /* ===== アクション ===== */
 const cur=()=>S.mons.find(m=>m.id===sel);
@@ -203,14 +225,14 @@ function nickOpen(id){S.nk=id;if(S.coin<C.NAMETAG_PRICE)return msg('コインが
 function nickOk(){const m=S.mons.find(x=>String(x.id)===String(S.nk)),v=$('nki').value.trim();if(!m||!v||S.coin<C.NAMETAG_PRICE)return;
  S.coin-=C.NAMETAG_PRICE;m.nick=v.slice(0,8);$('nick').style.display='none';act(m.nick+'と名付けた！')}
 function chestCheck(t){if(!S.chest&&t>=S.chestNext){S.chest=true;const e=Math.random()<.5;S.cx=e?S.size-.5:rnd(.4,S.size-.4);S.cy=e?rnd(.4,S.size-.4):S.size-.5;msg('宝箱が現れた！ コロニーの端っこを探してみよう')}}
-function openChest(){if(!S.chest)return;const R=C.CHEST,[sx,sy]=P(S.cx,S.cy);S.coin+=R.coin;S.stone+=R.stone;S.gem+=R.gem;S.f1+=R.fruit;S.chest=false;S.chestNext=now()+C.CHEST_H*3600;
+function openChest(){if(!S.chest)return;const R=C.CHEST,[sx,sy]=CP();S.coin+=R.coin;S.stone+=R.stone;S.gem+=R.gem;S.f1+=R.fruit;S.chest=false;S.chestNext=now()+C.CHEST_H*3600;
  for(let i=0;i<26;i++){const a=Math.random()*6.28,v=rnd(30,100);parts.push({x:sx,y:sy-16,vx:Math.cos(a)*v,vy:Math.sin(a)*v*.6-60,l:0,d:rnd(.7,1.3),s:rnd(2,4),c:['#ffe08a','#fff','#6ee7f9','#b48cff'][i%4]})}
  parts.push({txt:'宝箱ゲット！',x:sx,y:sy-50,l:0,d:1.6});parts.push({ring:1,x:sx,y:sy,l:0,d:1});
  act(`宝箱を開けた！ コイン${R.coin}・魔石${R.stone}・宝石${R.gem}・フルーツ×${R.fruit}を獲得！`)}
-function drawChest(t){const[sx,sy]=P(S.cx,S.cy),im=ICI.chest;g.fillStyle='#0003';g.beginPath();g.ellipse(sx,sy,16,6,0,0,7);g.fill();
+function drawChest(t){const[sx,sy]=CP(),im=ICI.chest;g.fillStyle='#0003';g.beginPath();g.ellipse(sx,sy,16,6,0,0,7);g.fill();
  if(im.complete&&im.naturalWidth){const w=38,h=w*im.naturalHeight/im.naturalWidth;g.shadowColor='#ffe08a';g.shadowBlur=12+Math.sin(t*4)*6;g.drawImage(im,sx-w/2,sy+3-h+Math.sin(t*3)*2,w,h);g.shadowBlur=0}
  g.fillStyle='#fff';const k=Math.sin(t*5)>0?3:2;g.fillRect(sx+14,sy-26,k,k);g.fillRect(sx-16,sy-18+Math.sin(t*3)*2,2,2)}
-function chestHit(e){if(!S.chest)return false;const[px,py]=wpt(e),[sx,sy]=P(S.cx,S.cy);return Math.hypot(px-sx,py-(sy-14))<30}
+function chestHit(e){if(!S.chest)return false;const[px,py]=wpt(e),[sx,sy]=CP();return Math.hypot(px-sx,py-(sy-14))<30}
 function exportData(){S.last=now();save();const b=new Blob([JSON.stringify(S)],{type:'application/json'}),a=document.createElement('a');
  a.href=URL.createObjectURL(b);a.download='colony_save_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),3000);mm('データをファイルに保存しました')}
 function importData(inp){const fl=inp.files[0];if(!fl)return;const rd=new FileReader();
@@ -267,6 +289,11 @@ function cook(){const m=cur();if(!m||m.dead||m.stage!=='god'||!SPECIES[m.sp].coo
  const t=S.mons.filter(x=>x!==m&&!x.dead&&x.stage!=='egg');if(!t.length)return msg('ほかに満腹度を回復できるキャラがいません');
  S.mons=S.mons.filter(x=>x!==m);sel=null;t.forEach(x=>{x.hunger=Math.min(C.HUNGER_MAX,x.hunger+C.COOK_FILL);if(x.hunger>0)x.starve=0;fxQ.push({m:x,k:'egg'})});
  act(`${nm}を調理した！ ${t.length}匹の満腹度が+${C.COOK_FILL}回復`)}
+function colUI(){const b=$('colbtn');if(!b)return;b.style.display=S.alt?'':'none';b.textContent=S.cur?'☀️ 第1コロニーへ':'🌙 第2コロニーへ'}
+function buyColony2(){const c=C.COLONY2_COST;if(S.alt||S.coin<c.coin||S.gem<c.gem||S.stone<c.stone)return;S.coin-=c.coin;S.gem-=c.gem;S.stone-=c.stone;S.alt={mons:[],size:C.START_SIZE};act('🌙 第2コロニーを手に入れた！ 画面下のボタンで行き来できます')}
+function switchCol(){if(!S.alt)return;const t=S.mons,z=S.size;S.mons=S.alt.mons;S.size=S.alt.size;S.alt={mons:t,size:z};S.cur=S.cur?0:1;sel=null;S.mons.forEach(place);dispSize=S.size;zoom(0);fxQ.length=0;parts.length=0;act(S.cur?'🌙 第2コロニーに来た':'☀️ 第1コロニーに戻った')}
+function moveCol(){const m=cur();if(!m||!S.alt)return;if(S.alt.size**2-S.alt.mons.length<=0)return msg('移動先のコロニーがいっぱいです');S.mons=S.mons.filter(x=>x!==m);m.mode='idle';S.alt.mons.push(m);sel=null;act(nmOf(m)+'を'+(S.cur?'第1':'第2')+'コロニーへ移動した')}
+function questInfo(){$('info').style.display='flex'}
 function buyBasket(){const B=C.BASKET;if(S.coin<B.coin||S.gem<B.gem)return;const t=S.mons.filter(m=>!m.dead&&m.stage!=='egg');if(!t.length)return msg('満腹度を回復できるキャラがいません');
  ask(`コロニーの${t.length}匹の満腹度を+${B.fill}回復します（🪙${B.coin}・宝石${B.gem}）`,'はい、使う',()=>{S.coin-=B.coin;S.gem-=B.gem;t.forEach(m=>{m.hunger=Math.min(C.HUNGER_MAX,m.hunger+B.fill);if(m.hunger>0)m.starve=0});act('全員の満腹度が回復した！')})}
 function buyTimer(){if(S.gem<C.TIMER_GEM_PRICE)return;S.gem-=C.TIMER_GEM_PRICE;S.timer++;act('⏱を手に入れた！')}
@@ -278,11 +305,11 @@ function landFx(old){const n=S.size,oyF=(H-n*TH)/2-14,Q=(x,y)=>[ox+(x-y)*TW/2,oy
  const c=Q(n/2,n/2);parts.push({txt:'土地が広がった！',x:c[0],y:c[1]-40,l:0,d:1.8});parts.push({ring:1,x:c[0],y:c[1],l:0,d:1.2});parts.push({ring:1,x:c[0],y:c[1],l:-.25,d:1.2})}
 function expand(){const c=C.EXPAND[S.size-C.START_SIZE];if(!c||S.coin<c.c||S.stone<c.s)return;
  S.coin-=c.c;S.stone-=c.s;const old=S.size;S.size++;landFx(old);closeShop();act(`土地を拡張！ キャパ${S.size**2}`)}
-function act(t){if(t)msg(t);save();ui();shopUI();boxUI()}
+function act(t){if(t)msg(t);dexSync();save();ui();shopUI();boxUI();dexUI()}
 
 /* ===== UI ===== */
 let pick=-1;
-function hud(){$('menuInfo').innerHTML=`キャパ: ${S.mons.length}/${S.size**2}（土地 ${S.size}×${S.size}）　📦 ${S.box.length}/${S.boxCap}<br>${ic('coin')} ${S.coin}　${ic('stone')} ${S.stone}　${ic('gem')} ${S.gem}　⏱ ${S.timer}<br>${ic('xp')} ${S.xp}　${ic('f1')} ${S.f1}　${ic('f2')} ${S.f2}　${ic('f3')} ${S.f3}<br>🕐 次回収集: ${Math.ceil((3600-S.acc)/60)}分`}
+function hud(){colUI();$('menuInfo').innerHTML=`${S.alt?(S.cur?'🌙第2コロニー　':'☀️第1コロニー　'):''}キャパ: ${S.mons.length}/${S.size**2}（土地 ${S.size}×${S.size}）　📦 ${S.box.length}/${S.boxCap}<br>${ic('coin')} ${S.coin}　${ic('stone')} ${S.stone}　${ic('gem')} ${S.gem}　⏱ ${S.timer}<br>${ic('xp')} ${S.xp}　${ic('f1')} ${S.f1}　${ic('f2')} ${S.f2}　${ic('f3')} ${S.f3}<br>🕐 次回収集: ${Math.ceil((3600-S.acc)/60)}分`}
 function ui(){hud();
  const m=cur();let h='モンスターをタップして選択';
  if(m){const s=SPECIES[m.sp],need=needXp(m);
@@ -292,7 +319,7 @@ function ui(){hud();
   経験 <span class="bar"><i style="width:${need?m.exp/need*100:100}%;background:#b48cff"></i></span> ${need?m.exp+'/'+need+'（次: '+SL[ST[ST.indexOf(m.stage)+1]]+'）':'MAX'}<br>`+
   (m.dead?`<button onclick="revive()" ${S.stone<C.REVIVE?'disabled':''}>蘇生（${ic('stone')}${C.REVIVE}）</button>`:
   `${C.FRUITS.map((f,i)=>`<button onclick="feed(${i})" ${S[f.id]<1?'disabled':''}>${ic(f.id)}×${S[f.id]}</button>`).join('')}<button onclick="usePotion()" ${S.xp<1||m.stage==='god'?'disabled':''}>${ic('xp')}×${S.xp}</button><button onclick="startMG()">ミニゲーム</button>${(SPECIES[m.sp].cook&&m.stage==='god')?'<button onclick="cook()">🍳 調理する</button>':''}`)}
-  h+=`<div class="dev">${bringInfo(m)}</div>`}
+  h+=`<div class="dev">${bringInfo(m)}</div>`;if(S.alt)h+=`<div style="margin-top:4px"><button onclick="moveCol()">🚚 ${S.cur?'第1':'第2'}コロニーへ移動</button></div>`}
  $('panel').innerHTML=h}
 let pickSp=0,pickRar=0;
 function shopUI(){const lst=speciesFor(pickRar);if(!lst.includes(pickSp))pickSp=lst[0];const fb=!SPECIES.some(s=>tierOf(s)===pickRar),c=C.EXPAND[S.size-C.START_SIZE],free=S.box.length<S.boxCap,free10=S.boxCap-S.box.length>=C.MULTI,gods=S.mons.filter(m=>m.stage==='god');
@@ -307,7 +334,8 @@ function shopUI(){const lst=speciesFor(pickRar);if(!lst.includes(pickSp))pickSp=
  ${row(`⏱ 時短（ふ化-${C.TIMER_H}h）×${S.timer}`,'',ic('gem')+C.TIMER_GEM_PRICE,S.gem<C.TIMER_GEM_PRICE,'buyTimer()')}
  ${row(`${ic('xp')} XPポーション（XP+${C.XP_POTION}）×${S.xp}`,'',ic('stone')+C.XP_POTION_STONE,S.stone<C.XP_POTION_STONE,"buyItem('xp')")}<hr>
  <div>🏷 名札（神族に名前をつける）</div>${gods.map(m=>row(rb(m)+nmOf(m),'',ic('coin')+C.NAMETAG_PRICE,S.coin<C.NAMETAG_PRICE,`nickOpen('${m.id}')`)).join('')||'<div class="dev">神族がいません</div>'}<hr>
- <div class="srow">🗺 土地拡張${c?` ${S.size}→${S.size+1}<button onclick="expand()" ${S.coin<c.c||S.stone<c.s?'disabled':''}>${ic('coin')}${c.c} ${ic('stone')}${c.s}</button>`:'（最大）'}</div>
+ <div class="srow">🗺 土地拡張${S.alt?(S.cur?'（第2）':'（第1）'):''}${c?` ${S.size}→${S.size+1}<button onclick="expand()" ${S.coin<c.c||S.stone<c.s?'disabled':''}>${ic('coin')}${c.c} ${ic('stone')}${c.s}</button>`:'（最大）'}</div>
+ <div class="srow"><span>🌙 第2コロニー（夜）</span>${S.alt?'購入済み':`<button onclick="buyColony2()" ${S.coin<C.COLONY2_COST.coin||S.gem<C.COLONY2_COST.gem||S.stone<C.COLONY2_COST.stone?'disabled':''}>${ic('coin')}${C.COLONY2_COST.coin} ${ic('gem')}${C.COLONY2_COST.gem} ${ic('stone')}${C.COLONY2_COST.stone}</button>`}</div>
  <div class="srow"><span>📦 ボックス ${S.box.length}/${S.boxCap}</span>${(()=>{const n=boxNext();if(!n)return'（最大）';const c=n.cost;return `<button onclick="boxUpgrade()" ${S.coin<c.coin||S.gem<c.gem||S.stone<c.stone?'disabled':''}>${S.boxCap}▶${Math.min(C.BOX_MAX,S.boxCap+n.add)} ${ic('coin')}${c.coin} ${ic('gem')}${c.gem} ${ic('stone')}${c.stone}</button>`})()}</div>
  <hr><div>キャラを売る</div>${S.mons.map(m=>row(`${rb(m)}${nmOf(m)}（${SL[m.stage]}）`,'',ic('coin')+sellPrice(m),false,`sellAsk('${m.id}')`)).join('')||'<div class="dev">いません</div>'}`}
 function isGM(){return S.gm===true}
@@ -324,7 +352,7 @@ let wiping=false;
 function ask(t,yl,fn){$('cft').textContent=t;$('cfy').textContent=yl;$('cfy').onclick=()=>{$('cf').style.display='none';fn()};$('cf').style.display='flex'}
 function delData(){ask('本当にリセットしますか？','はい',()=>ask('最終確認です。すべてのデータが消え、元に戻せません。リセットしますか？','はい、リセットする',resetAll))}
 function resetAll(){try{localStorage.removeItem(C.KEY)}catch(e){}
- S={coin:C.START_COIN,stone:0,gem:0,timer:C.START_TIMER,starter:1,xp:0,f1:C.START_FRUIT,f2:0,f3:0,codes:{},box:[],boxCap:C.BOX_START,chest:false,chestNext:now()+C.CHEST_H*3600,name:S.name||'',size:C.START_SIZE,mons:[],last:now(),acc:0};S.mons.push(mk(0));dispSize=S.size;
+ S={coin:C.START_COIN,stone:0,gem:0,timer:C.START_TIMER,starter:1,xp:0,f1:C.START_FRUIT,f2:0,f3:0,codes:{},box:[],dex:{},boxCap:C.BOX_START,chest:false,chestNext:now()+C.CHEST_H*3600,name:S.name||'',size:C.START_SIZE,mons:[],last:now(),acc:0};S.mons.push(mk(0));dispSize=S.size;
  sel=null;fxQ.length=0;parts.length=0;zoom(0);save();closeMenu();ui();shopUI();msg('データをリセットしました')}
 let gT=[];
 function gflash(a,c){const f=$('gfl');f.style.background=c||'#fff';f.style.transition='none';f.style.opacity=a;requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.transition='opacity .7s';f.style.opacity=0}))}
@@ -351,14 +379,20 @@ let oy=0;const ox=W/2,cam={z:1,x:W/2,y:H/2-14};
 const P=(x,y)=>[ox+(x-y)*TW/2,oy+(x+y)*TH/2];
 function poly(pts,f){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(...p):g.moveTo(...p));g.closePath();g.fillStyle=f;g.fill()}
 function cloud(x,y,s){g.fillStyle='#fff';[[0,0,30],[28,-8,24],[-28,4,22],[56,4,20]].forEach(c=>{g.beginPath();g.ellipse(x+c[0]*s,y+c[1]*s,c[2]*s,c[2]*s*.6,0,0,7);g.fill()})}
-function sky(t){const k=g.createLinearGradient(0,0,0,H);k.addColorStop(0,'#6cc3ff');k.addColorStop(1,'#d9f1ff');g.fillStyle=k;g.fillRect(0,0,W,H);
+const CP=()=>P(Math.min(S.cx,S.size-.5),Math.min(S.cy,S.size-.5));
+function nightSky(t){const k=g.createLinearGradient(0,0,0,H);k.addColorStop(0,'#060a22');k.addColorStop(1,'#243872');g.fillStyle=k;g.fillRect(0,0,W,H);
+ for(let i=0;i<70;i++){const h=Math.sin(i*127.1)*43758.5,u=Math.abs(h-Math.floor(h)),v=Math.abs((h*7)%1),a=.35+.65*Math.abs(Math.sin(t*1.5+i)),z=i%5?1.5:2.5;g.fillStyle=`rgba(255,255,230,${a})`;g.fillRect(u*W,v*H*.7,z,z)}
+ g.save();g.shadowColor='#fff8c8';g.shadowBlur=24;g.fillStyle='#f4efc4';g.beginPath();g.arc(90,62,24,0,7);g.fill();g.restore();g.fillStyle='#dcd6a4';[[82,56,5],[98,70,4],[96,50,3]].forEach(c=>{g.beginPath();g.arc(c[0],c[1],c[2],0,7);g.fill()});
+ const q=t%9;if(q<.8){const p=q/.8;g.strokeStyle='#fff';g.lineWidth=2;g.beginPath();g.moveTo(100+p*220,20+p*90);g.lineTo(100+p*220-34,20+p*90-14);g.stroke()}}
+function fireflies(t){const n=dispSize;for(let i=0;i<16;i++){const u=(Math.sin(i*12.9+t*.35)*.5+.5)*n,v=(Math.sin(i*7.7+t*.3+1)*.5+.5)*n,[sx,sy]=P(u,v),a=.4+.6*Math.abs(Math.sin(t*2.5+i*1.7));g.save();g.shadowColor='#ffe98a';g.shadowBlur=10;g.fillStyle=`rgba(255,240,140,${a})`;g.fillRect(sx-1.5,sy-14-Math.sin(t*2+i)*4,3,3);g.restore()}}
+function sky(t){if(S.cur===1)return nightSky(t);const k=g.createLinearGradient(0,0,0,H);k.addColorStop(0,'#6cc3ff');k.addColorStop(1,'#d9f1ff');g.fillStyle=k;g.fillRect(0,0,W,H);
  [[40,50,1],[300,30,1.3],[520,80,.9]].forEach((c,i)=>cloud(((c[0]+t*(8+i*4))%(W+200))-100,c[1],c[2]))}
 function island(){const n=dispSize,d=26,a=P(0,n),b=P(n,n),r=P(n,0);
- poly([a,b,[b[0],b[1]+d],[a[0],a[1]+d]],'#7a4f2d');poly([b,r,[r[0],r[1]+d],[b[0],b[1]+d]],'#5e3b20');
+ poly([a,b,[b[0],b[1]+d],[a[0],a[1]+d]],(S.cur===1?'#3a2a4a':'#7a4f2d'));poly([b,r,[r[0],r[1]+d],[b[0],b[1]+d]],(S.cur===1?'#2a1f38':'#5e3b20'));
  for(let x=0;x<n;x++)for(let y=0;y<n;y++){
-  const x1=Math.min(x+1,n),y1=Math.min(y+1,n);poly([P(x,y),P(x1,y),P(x1,y1),P(x,y1)],(x+y)%2?'#4fcf3f':'#5bd94a');
+  const x1=Math.min(x+1,n),y1=Math.min(y+1,n);poly([P(x,y),P(x1,y),P(x1,y1),P(x,y1)],S.cur===1?((x+y)%2?'#1f5a58':'#256a64'):((x+y)%2?'#4fcf3f':'#5bd94a'));
   for(let k=0;k<3;k++){const h=Math.sin((x*7+y*13+k*5)*91.7)*43758.5,u=Math.abs(h-Math.floor(h)),v=Math.abs((h*7)%1);
-   const p=P(x+.15+u*.7,y+.15+v*.7);g.fillStyle=k?'#fff':'#ff7ac8';g.fillRect(p[0]-2,p[1]-2,4,4)}}}
+   const p=P(x+.15+u*.7,y+.15+v*.7);g.fillStyle=S.cur===1?(k?'#cfe9ff':'#ffd1f0'):(k?'#fff':'#ff7ac8');g.fillRect(p[0]-2,p[1]-2,4,4)}}}
 /* ピクセルアート（緑背景を透過して埋め込み済み） */
 const SPR=JSON.parse(document.getElementById('sprdata').textContent);
 const SPR_SCALE=0.8; // 表示倍率
@@ -401,7 +435,7 @@ function drawFx(dt){for(const p of parts){p.l+=dt;if(p.l<0)continue;const u=p.l/
  else if(p.txt){g.globalAlpha=Math.min(1,2*(1-u));g.font=(p.big?'bold 26px':'bold 18px')+' sans-serif';g.textAlign='center';g.textBaseline='middle';g.lineWidth=4;g.strokeStyle='#7a4f00';g.fillStyle='#fff3a0';const y=p.y-u*20;g.strokeText(p.txt,p.x,y);g.fillText(p.txt,p.x,y);g.globalAlpha=1}
  else{p.vy+=60*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;g.globalAlpha=Math.max(0,1-u);g.fillStyle=p.c;g.fillRect(p.x-p.s/2,p.y-p.s/2,p.s,p.s);g.globalAlpha=1}}
  for(let i=parts.length;i--;)if(parts[i].l>=parts[i].d)parts.splice(i,1)}
-const BS=[1,1,2,1.6,1.3,1.1,.95,.85];const sc=()=>{const i=Math.floor(dispSize),f=dispSize-i;return cam.z*(BS[i]+(BS[Math.min(7,i+1)]-BS[i])*f)};
+const BS=[1,1,2,1.6,1.3,1.1,.95,.85,.78];const sc=()=>{const i=Math.floor(dispSize),f=dispSize-i;return cam.z*(BS[i]+(BS[Math.min(8,i+1)]-BS[i])*f)};
 const cl=v=>Math.min(S.size-.3,Math.max(.3,v));
 let last=performance.now();
 function frameBody(ts){
@@ -414,7 +448,7 @@ function frameBody(ts){
    if(d>.03){const v=Math.min(d,.28*dt);m.gx+=dx/d*v;m.gy+=dy/d*v}else{m.mode='idle';m.w=rnd(2,5)}}
   else{m.w-=dt;if(m.w<=0){if(Math.random()<.4){m.mode='jump';m.jt=0}else{m.mode='walk';m.tx=cl(m.gx+rnd(-1,1));m.ty=cl(m.gy+rnd(-1,1))}}}});
  sky(t);g.save();g.translate(W/2,H/2);g.scale(sc(),sc());g.translate(-cam.x,-cam.y);
- island();if(S.chest)drawChest(t);[...S.mons].sort((a,b)=>a.gx+a.gy-b.gx-b.gy).forEach(m=>drawMon(m,t));drawFx(dt);g.restore()}
+ island();if(S.cur===1)fireflies(t);if(S.chest)drawChest(t);[...S.mons].sort((a,b)=>a.gx+a.gy-b.gx-b.gy).forEach(m=>drawMon(m,t));drawFx(dt);g.restore()}
 function frame(ts){try{frameBody(ts)}catch(e){try{g.setTransform(1,0,0,1,0,0)}catch(_){}__rep('描画エラー: '+(e&&e.message))}requestAnimationFrame(frame)}
 function zoom(f){if(!f||(cam.z=Math.min(2,Math.max(1,cam.z*f)))<=1){cam.z=1;cam.x=W/2;cam.y=H/2-14}}
 function focusSel(){const m=cur();if(!m)return msg('先にモンスターを選んでください');const[sx,sy]=P(m.gx,m.gy);cam.x=sx;cam.y=sy-20;cam.z=1.6}
@@ -527,6 +561,34 @@ function endMG(){if(G.done)return;if(G.k===5&&!G.pop)G.score+=potOf(G.s);G.done=
  q.fillStyle='#000d';q.fillRect(0,120,320,160);q.fillStyle='#fff';q.textAlign='center';q.textBaseline='middle';q.font='bold 20px sans-serif';q.fillText(`スコア ${G.score}（達成率 ${pct}%）`,160,165);
  q.font='bold 30px sans-serif';q.fillStyle='#ffe08a';q.fillText(god?'神族はXP不要です':`${e}XP獲得！`,160,220);$('mgx').style.display='inline-block';save()}
 function closeMG(){G=null;$('ov').style.display='none';act()}
+
+/* ===== 図鑑 ===== */
+const DEX_EGG='孵化したらどんな子が生まれるかな？';
+const DEXMAP={};[["ラグナ", "まだ角の小さい、やんちゃな赤うさぎ。ぴょんぴょん跳ねては、草原を駆けまわる。", "黒く立派な角をもつ大うさぎ。怒ると角で岩も砕くが、なでられるのは大好き。", "白い翼で空を舞う神聖なうさぎ。赤い瞳に見つめられると、迷いが消えるという。"], ["サイクロ", "まん丸の体に大きな目がひとつ。しっぽをふりふり、なんでもじっと見つめる。", "トゲの背中とするどい牙をもつ一つ目の怪物。見た目は怖いが、実は仲間思い。", "炎色の翼を広げた一つ目の竜。その瞳は、遠い未来まで見通すといわれる。"], ["アクアリ", "水色の小さなウーパールーパー。ふわふわのえらを揺らして、のんびり泳ぐ。", "ぷにぷにの体で二本足で立つ大きなウーパー。いつも笑顔で、争いが苦手。", "蝶のような光る羽をまとった水の精霊。羽ばたくたび、水しぶきがきらきら舞う。"], ["ケリュネ", "黄色い体にまだらの模様の子鹿。ちいさな角で、母のあとをついてまわる。", "金色の毛並みと立派な角をもつ鹿。森の主として、迷った旅人を道案内する。", "白金の翼をもつ神鹿。通ったあとの大地には、やさしい花が咲くという。"], ["ククル", "緑色の小さなヘビ。とぐろを巻いて、日なたぼっこをするのが大好き。", "宝石のような鱗を光らせる大蛇。ゆっくり動くが、締めつけは岩をも砕く。", "翠の翼をもつ竜の姿になったヘビ。嵐を呼び、空を自由に泳ぐといわれる。"], ["ノーム", "黒い服にふさふさの眉とひげで、顔がほとんど見えない小さなおじさん。口ぐせは「ふん」。", "大きな鼻と灰色のひげをもつ頑固なトロール。力持ちで、洞窟のことなら何でも知っている。", "杖と神聖な翼をたずさえた仙人。ひげの奥の瞳は、すべての知恵を映している。"], ["セレス", "ピンクの毛並みにちいさな角の子馬。まだ上手に走れず、よくころぶ。", "ふさふさのたてがみをなびかせるユニコーン。角でふれた傷は、すぐに癒える。", "光の翼を広げた天馬。空を駆けるたび、桃色の羽根が雪のように降りそそぐ。"], ["フォコン", "白いふわふわの子ぎつね。青い鬼火がそばをただよい、寂しがりやな性格。", "九本のしっぽに青い炎をともした白狐。しっぽが増えるたび、賢さも増すという。", "翼を得た九尾の神狐。しっぽの先から、清らかな光の火がこぼれ落ちる。"], ["タイジャ", "二つの頭をもつ小さな蛇。頭同士でよくけんかするが、いつも一緒に寝る。", "五つの頭で獲物を見張る大蛇。ひとつの頭が眠っても、ほかの頭は決して目を閉じない。", "白い翼と五つの頭をもつ神の大蛇。五つの首がそろって歌うと、嵐もしずまる。"], ["メカ67号", "ちいさなジェットで浮かぶお掃除ロボ…のはずが、なぜか冒険が大好き。", "剣と盾を装備した戦闘ロボ。ピンチになるほど、目の光が青く輝く。", "天使の翼と光輪をそなえた白銀の機神。その剣は、夜明けの光でできている。"], ["オーロラドラゴン", "水晶の鱗をちりばめた小さな竜。泣くと、涙がちいさな宝石に変わる。", "青紫の結晶をまとう竜。翼を広げると、オーロラのような光が空に走る。", "真珠色に輝く翼竜。羽ばたきひとつで、夜空に七色のカーテンを描く。"], ["チュライム", "ぷるぷるの水色スライム。つついたら、ぽよんと跳ねて笑った。", "王冠と氷の剣をもつスライムの騎士。ぷるぷるの体の下に、鎧が隠れている。", "光輪と翼をもつ真珠色の精霊。ふわふわ浮かんで、ひとを癒やす。"], ["ホウオウ", "金色の羽毛のひよこ。ぴよぴよ鳴くたびに、小さな火の粉が飛ぶ。", "炎の羽根をもつ鳳凰。夕焼けの空をひと回りすると、空が赤く染まる。", "白金に輝く神の鳳凰。その羽根にふれた者は、願いをひとつだけ叶えられるという。"], ["ポチ太郎", "茶色と白の元気な子犬。しっぽをぶんぶん振って、だれにでも飛びつく。", "青い鎧をまとった忠犬。守ると決めた主人のそばを、決して離れない。", "光の翼をもつ白い神獣。遠吠えは、迷子の魂を家まで導く。"], ["ホエル", "ちいさな青いクジラの子。ぷうっと潮を吹いては、自分でびっくりしている。", "星の模様が光る大きなクジラ。夜の海をゆく姿は、泳ぐ天の川のよう。", "真珠色の翼で空を泳ぐクジラ。歌声は雲を越えて、星にまで届くという。"], ["トレント", "頭に若葉の冠をのせた小さな木の子。日なたでうとうと眠るのが日課。", "苔とキノコにおおわれた古木の巨人。何百年も、森の出来事を見守っている。", "宝石の冠と羽をもつ森の女神。足もとには、色とりどりの花が咲き広がる。"], ["マーシュド", "紫の傘をかぶった小さなキノコ。ぽんぽん跳ねると、胞子がきらきら舞う。", "水晶の傘をいただく木の精。根っこの足で、静かに森を歩きまわる。", "白い翼をもつキノコの天使。そっと羽ばたくと、やさしい光の胞子が降る。"], ["モンピ", "くりくりの目の子ザル。きらきら光るものを見つけると、すぐ拾ってしまう。", "たくましい腕と長いしっぽの猿。木から木へ、風のように飛び移る。", "月の模様をもつ白い神猿。光の輪の下で、静かに世界を見つめている。"], ["レぺリオ", "七色に色が変わる子カメレオン。気分によって、体の色がころころ変わる。", "ネオンの模様が光る大きなカメレオン。枝に化けて、静かに獲物を待つ。", "白い光の翼をもつ聖なるカメレオン。しっぽのうずまきは、時間の渦だといわれる。"], ["トントン", "ピンクの元気な子ぶた。おいしいものの匂いなら、どこでも嗅ぎつける。", "体に光のルーン文字が浮かぶ大イノシシ。牙で突進すると、地面が震える。", "白い翼をもつ神のぶた。ふっくらした体は、食べた者を元気にするという。"], ["パオーシャ", "耳の大きな青い子ゾウ。長いお鼻で水をかけるのが得意。", "鎧と鞍をつけた戦のゾウ。重い足音は、遠くの山まで響きわたる。", "金の飾りと翼をもつ白象の神。額の月の紋章が、夜を静かに照らす。"], ["ダークドラゴン", "黒い体に角と炎の斑点がある小さな竜。夜が好きで、昼はよく寝ている。", "炎の翼をもつ漆黒の竜。ひと吠えで、森じゅうの鳥が飛び立つ。", "白金の鎧と翼をもつ聖なる竜。闇を抱きしめて光に変える力をもつ。"], ["ヌエ", "ネズミのような体にヘビのしっぽ。小さいけれど、とても好奇心旺盛。", "サルの顔、トラの体、ヘビの尾をもつ怪獣。雷雲とともに、夜空を駆ける。", "真っ白な翼をもつ聖なるヌエ。その鳴き声は、不吉を払うといわれる。"], ["ルーンパンサー", "光る羽をもつ黒い子猫。月明かりの下で、ルーン文字の模様がほんのり光る。", "背中に剣を背負った青い模様の黒豹。影のように、音もなく歩く。", "黄金の兜と翼をもつ白い獅子の神。ひと吠えで、闇を切りひらく。"], ["ワタツミ", "小さなひれをもつ水の竜の子。波の上を、すいすい泳ぎまわる。", "水の渦をまとう青い龍。その巨体は、海そのものの力を宿している。", "白い翼をもつ海の神龍。しなやかな体で、雲の上をゆうゆうと泳ぐ。"], ["コスモオウル", "星空みたいな模様のまんまるなヒナ。夜になると、羽がぴかぴか光る。", "星座を翼に宿す大ふくろう。夜空を横切ると、星がひとつ流れる。", "真珠色の翼をもつ聖なるふくろう。ひとたび鳴けば、夜が明けるといわれる。"], ["クリスナイン", "水晶のしっぽをもつ紫の子ぎつね。しっぽを揺らすと、ちりんと鳴る。", "結晶のしっぽをもつ紫のきつね。月の光を集めて、しっぽに蓄える。", "白い翼をもつ九尾の神狐。ひとふりのしっぽで、願いがひとつ叶う。"], ["イースター", "卵の殻から顔を出したピンクのうさぎ。きょろきょろ、世界を見わたしている。", "ふさふさの垂れ耳のピンクのうさぎ。春になると、野原に卵を隠してまわる。", "白い翼と王冠をもつ春の神うさぎ。卵に、しあわせをひとつ込めてくれる。"], ["オーロ", "金色の卵に目がついたような不思議な生き物。ころころ転がって、あたりを探検する。", "金の翼をもつ黄金のたまご。ふわりと浮かびながら、幸運を運んでくる。", "黄金に輝く翼竜。羽ばたくたび、金貨と幸運がきらきらと舞いおちる。"], ["ステラード", "星座の模様の羽をもつ紫のひなどり。夜になると、羽がぴかぴか光る。", "黄金の冠と星の翼をもつ大鳥。夜空を飛ぶと、星座が一緒についてくる。", "魚の尾をもつ星の女神。手にした杖は、命の泉を呼びさますという。"], ["ギャラクタ", "銀河の模様がきらめく青い子牛。角の先に、小さな星がひとつ灯っている。", "水晶の鎧と金の角をもつ翼牛。まわりには、小さな星がくるくる回っている。", "六つの目玉を従える天の母。翼と魚の尾で、星の海をゆったり泳ぐ。"], ["ネプ", "白い仮面をつけた黒い子牛。仮面の下は、まだだれも見たことがない。", "金の鎧と大きな角をもつ黒い雄牛。仮面は決して外れず、表情は読めない。", "六本の腕に宝物をたずさえた白い天使。仮面の奥から、やさしい光がもれている。"], ["オケアノ", "目玉がいくつもついた肉の玉。見た目はこわいが、実はとても臆病。", "うねる触手と無数の目をもつ怪物。暗い海の底で、じっと何かを待っている。", "紫の炎に包まれた深海の主。目を合わせた者は、海の夢を見るという。"], ["ネビュリス", "星の粒をちりばめた小さなタコの子。きょとんとした目で、宇宙を見つめている。", "星座を宿した体をもつ宇宙の怪物。ふしぎな力で、小さな惑星も動かす。", "光輪と白い翼をもつ宇宙の天使。星の渦をまとって、静かに舞い降りる。"], ["オービット", "星模様の殻をもつ小さなカタツムリ。ゆっくり進んだあとに、光の筋ができる。", "惑星の輪をまとった大きなカタツムリ。殻の中には、小さな宇宙が広がっている。", "水晶の殻に翼をもつ白いカタツムリ。星のかけらを、そっと運んでくれる。"], ["ペタ", "大きな目の紫の子ダコ。ぷくぷく泡を吹いて、ごきげんに泳ぐ。", "しなやかな触手をもつ紫のイカ。暗い海を、矢のように泳ぐ。", "金の翼と光輪をもつ白いタコの天使。そっとなでると、あたたかい光がともる。"], ["パピリア", "むらさき色のちいさな芋虫。まんまるの目で、いつも空を見あげている。", "うずまき模様の羽をもつ青い蝶。羽ばたくと、きらきらの鱗粉が風に舞う。", "光の羽をもつ聖なる鹿。たたずむだけで、あたり一面が明るく輝く。"], ["ゲンブル", "青い甲羅の子ガメ。きらきらした大きな目で、世界を見つめている。", "甲羅からヘビが顔を出す大亀。北の海の守り神といわれている。", "白い甲羅と金の翼をもつ神亀。光輪の下で、ゆっくり世界を見守る。"], ["ミルティ", "しましまの白い子トラ。じゃれて遊ぶのが大好きで、よくころころ転がる。", "青い炎をまとって歩く白いトラ。ひと吠えで、氷の風が吹き荒れる。", "金の翼をもつ白虎の神。体のうずまき模様は、風の流れを表している。"], ["アラクニ", "紫のちいさなクモ。細い糸で、朝つゆをきれいに飾るのが得意。", "大きな蜘蛛の巣を張る紫の大蜘蛛。巣にふれた獲物は、決して逃さない。", "真珠色の翼と星の光輪をもつ白い蜘蛛。糸は、月の光をよりあわせてできている。"], ["タチ", "小さな羽の生えたイタチの子。くるくる回って遊ぶと、ちいさな風が起きる。", "緑の風をまとって宙を舞うイタチ。通ったあとには、かまいたちのような風が残る。", "白い翼と長い髪をもつ風の神獣。やさしい風を運び、迷った旅人を導く。"], ["ハニーラ", "ふわふわの丸いミツバチの子。花のみつを集めるのが何より楽しい。", "まん丸でやさしい顔の大きなハチ。集めた蜜は、食べると元気が湧いてくる。", "金の羽と光輪をもつ白い蜂の精。ひと舞いするごとに、花が咲いていく。"], ["ガード", "まるまると太った緑の幼虫。葉っぱをもぐもぐ食べて、すくすく育つ。", "深緑の鎧をまとった甲虫の戦士。金色の大きな角で、仲間を守りぬく。", "白銀の鎧と金の翼をもつ聖なる甲虫の騎士。角は、夜明けの光のように輝く。"], ["クラウン", "小さな王冠をのせた金の卵。ひと目見たら、だれもが振り向く不思議なたまご。", "黄金の王冠の中で目覚めたグリフォンのヒナ。手にした小瓶には、秘薬が入っている。", "宝石の王冠と杖をもつグリフォンの王。まわりには、不思議な宝石が舞っている。"]].forEach(a=>DEXMAP[a[0]]=a);
+const DEXST=['egg','baby','adult','god'];let dexSel=0,dexLast=-1;
+function dexOrder(){const k=i=>SPECIES[i].tier===-1?9:(SPECIES[i].tier||0);return SPECIES.map((_,i)=>i).sort((a,b)=>k(a)-k(b)||a-b)}
+function dexCount(){let c=0,r=0;for(const n in S.dex)for(const st in S.dex[n]){if(S.dex[n][st]===1)c++;if(S.dex[n][st]===2)r++}return[c,r]}
+function dexBadge(){const b=$('dexbtn');if(!b)return;const c=dexCount()[0];if(c===dexLast)return;dexLast=c;b.innerHTML='📖 図鑑'+(c?' <span class="dbadge">!</span>':'')}
+function dexSync(){S.dex=S.dex||{};let ch=false;[...S.mons,...(S.alt?S.alt.mons:[])].forEach(m=>{const n=SPECIES[m.sp].n,d=S.dex[n]||(S.dex[n]={});for(let i=0;i<=ST.indexOf(m.stage);i++){if(!d[ST[i]]){d[ST[i]]=1;ch=true}}});dexBadge();return ch}
+function dexUI(){const mod=$('dexm');if(!mod||mod.style.display!=='flex')return;S.dex=S.dex||{};const[c,r]=dexCount();
+ $('dexInfo').textContent=`登録 ${r}/${SPECIES.length*4}`+(c?`　光る「？」をタップして登録！（${c}個）`:'');
+ $('dexGrid').innerHTML=dexOrder().map(i=>{const n=SPECIES[i].n,d=S.dex[n]||{},e=d.egg||0,any=DEXST.some(st=>d[st]===1),R=C.RARITY[Math.max(0,SPECIES[i].tier||0)];
+  const inner=e===2?`<i class="egi eg${i}"></i><div class="bn">${n}</div>`:`<div class="${e===1?'dq':'dlock'}">？</div><div class="bn">？？？</div>`;
+  return `<div class="bcard dtile ${i===dexSel?'sel':''}" ${e===2?`style="border-color:${R.col}"`:''} onclick="dexTap(${i})">${inner}${any?'<span class="dbadge">!</span>':''}</div>`}).join('');
+ const i=dexSel,sp=SPECIES[i],d=S.dex[sp.n]||{},t=DEXMAP[sp.n]||[];
+ $('dexDetail').innerHTML=`<div class="dtitle">${d.egg===2?sp.n:'？？？'}</div>`+DEXST.map((st,k)=>{
+  const v=d[st]||0,txt=st==='egg'?DEX_EGG:(t[k]||'…');
+  const img=v===2?`<img src="${SPR[IDS[i]+'_'+st]}" alt="">`:`<div class="${v===1?'dq':'dlock'}">？</div>`;
+  const body=v===2?`<div class="dnm">${sp.n}</div><div class="dds">${txt}</div>`:v===1?`<div class="dnm">？？？</div><div class="dds dtap">タップして図鑑に登録！　${ic('coin')}+${C.DEX_REWARD[st]}</div>`:`<div class="dnm">？？？</div><div class="dds">？？？</div>`;
+  return `<div class="dslot ${v===1?'dclaim':''}" data-slot="${i}-${st}" ${v===1?`onclick="dexClaim(${i},'${st}')"`:''}><div class="dimg">${img}</div><div class="dtx"><div class="dst">${SL[st]}</div>${body}</div></div>`}).join('')}
+function dexTap(i){const d=(S.dex||{})[SPECIES[i].n];dexSel=i;if(d&&d.egg===1){dexClaim(i,'egg')}else dexUI();const b=$('dexm').firstElementChild;if(b)b.scrollTop=0}
+function dexClaim(i,st){const n=SPECIES[i].n,d=S.dex&&S.dex[n];if(!d||d[st]!==1)return;d[st]=2;const rw=C.DEX_REWARD[st];S.coin+=rw;dexSel=i;act('図鑑に登録！ 🪙+'+rw);
+ const el=document.querySelector('[data-slot="'+i+'-'+st+'"]');if(el){el.classList.add('dxflash');dexBurst(el,rw)}}
+function dexBurst(el,rw){const b=el.getBoundingClientRect(),cx=b.left+Math.min(60,b.width/2),cy=b.top+b.height/2;
+ for(let i=0;i<16;i++){const sp=document.createElement('span');sp.className='dxp';sp.textContent=['✨','⭐','🪙','✨'][i%4];sp.style.left=cx+'px';sp.style.top=cy+'px';const a=Math.random()*6.28,d=rnd(40,120);sp.style.setProperty('--dx',Math.cos(a)*d+'px');sp.style.setProperty('--dy',Math.sin(a)*d+'px');document.body.appendChild(sp);setTimeout(()=>sp.remove(),1000)}
+ const t=document.createElement('span');t.className='dxt';t.textContent='+'+rw+' 🪙';t.style.left=cx+'px';t.style.top=cy+'px';document.body.appendChild(t);setTimeout(()=>t.remove(),1200)}
+function openDex(){$('dexm').style.display='flex';dexSync();dexUI()}
+function closeDex(){$('dexm').style.display='none'}
 
 /* ===== 起動 ===== */
 {const st2=document.createElement('style');st2.textContent=SPECIES.map((s,i)=>`.eg${i}{background-image:url(${SPR[IDS[i]+'_egg']})}`).join('');document.head.appendChild(st2)}
