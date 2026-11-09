@@ -300,7 +300,7 @@ function boxUpgrade(){const n=boxNext();if(!n)return;const c=n.cost;if(S.coin<c.
 function openBox(){$('boxm').style.display='flex';boxUI()}
 function closeBox(){$('boxm').style.display='none'}
 function cook(){const m=cur();if(!m||m.dead||m.stage!=='god'||!SPECIES[m.sp].cook)return;const nm=nmOf(m);
- if(SPECIES[m.sp].cook==='nm'){S.mons=S.mons.filter(x=>x!==m);sel=null;S.nm=(S.nm||0)+1;return act(`${nm}を調理した…「悪夢の料理」を手に入れた（所持${S.nm}）`)}
+ if(SPECIES[m.sp].cook==='nm'){S.mons=S.mons.filter(x=>x!==m);sel=null;S.nm=(S.nm||0)+5;return act(`${nm}を調理した…「悪夢の料理」を5つ手に入れた（所持${S.nm}）`)}
  const t=S.mons.filter(x=>x!==m&&!x.dead&&x.stage!=='egg');if(!t.length)return msg('ほかに満腹度を回復できるキャラがいません');
  S.mons=S.mons.filter(x=>x!==m);sel=null;t.forEach(x=>{x.hunger=Math.min(C.HUNGER_MAX,x.hunger+C.COOK_FILL);if(x.hunger>0)x.starve=0;fxQ.push({m:x,k:'egg'})});
  act(`${nm}を調理した！ ${t.length}匹の満腹度が+${C.COOK_FILL}回復`)}
@@ -703,14 +703,15 @@ requestAnimationFrame(frame);
 const QC={
  DECK_MAX:6,                          // デッキの最大人数
  RM:[1,1.15,1.35,1.6,2.0],            // レア度ごとのステータス倍率（N/R/SR/UR/GR）
- LB_NEED:[10,10,10,10,1], LB_MAX:10,  // 1凸に必要な素材数（GRだけ1匹）/ 最大凸数
+ LB_NEED:[10,10,5,2,1], LB_MAX:10,  // 1凸に必要な素材数（N/R:10匹・SR:5匹・UR:2匹・GR:1匹）/ 最大凸数
  BOND_MAX:100, BOND_DAY:3,            // 絆の最大Lv / 1日に上がる上限
  BOND_STEP:10, BOND_BONUS:10,         // 絆Lvが10上がるごとにランダムで+10
- HQ_MOVE:50, HQ_REVIVE:3,            // 隠しクエストの条件
+ HQ_MOVE:10, HQ_REVIVE:2,            // 隠しクエストの条件
  TIME_LIMIT:90, SPEED:2,
  REPEAT_RATE:0.05,                    // 2回目のクリア報酬・XP（初回の何倍か）
  ST_MAX:10, ST_REGEN:3600,             // クエスト用の体力：最大10、1時間に1回復
  ST_BUY:{n:5,coin:10000,gem:100,stone:100}, // 体力5回復の値段
+ NAZO:0.2,                            // 謎の攻撃：最大HPの2割
  NM_DROP:0.01,                        // クエストクリアのたびに「悪夢の料理」が落ちる確率
  REPEAT_DECAY:0.7,                    // 3回目以降は、クリアするたびに前回の0.7倍に減っていく              // バトルの制限時間(秒) / 再生速度
  PRE_AT:0.15, KILL_EVERY:4, POISON:60 // ボスギミック：先制の発動時刻 / 即死の間隔(秒) / 毒ダメージ(毎秒・防御無視)
@@ -756,14 +757,20 @@ const QUESTS=[
  {n:'【BOSS】業火のフレイムイフリート',boss:1,hint:'燃えさかる業火が一気に体を焼きつくす。炎のあいだは回復も届かない…弱まるまで耐えられるか',dot:'🔥 業火が体を焼きつくす…回復が届かない！',burn:[0.1,15],xp:190,r:{coin:4500,stone:300},f:{gem:180},e:[['ifrit',140000,110,80,0.8,["poison"]]]},
  {n:'【最終BOSS】悪夢の李徴',ch:'裏章　悪夢の果て',boss:1,hint:'疾風・即死・瘴気…すべての悪夢が同時におそいかかる。瘴気で回復は封じられる。隠しクエストをすべて越え、最強の仲間をそろえた者だけが勝てる',dot:'☣️ 悪夢の瘴気が体をむしばむ…回復が届かない！',noheal:1,ke:1.5,xp:196,r:{coin:14650},f:{gem:1000},e:[['richou',9000,300,470,0.7,["pre","kill","poison"]]]}
 ];
+QUESTS.forEach((q,i)=>{if(i>=15)q.nazo=1});   // 後半（16面〜）：開始時に「謎の攻撃」で体力が2割けずられる
 const TITLES={
  wander:{q:'昼夜を彷徨うもの',t:'黄昏の放浪者',fx:'素早さ・攻撃速度 +50%（先制攻撃より先に動く）',ic:'🌗'},
  bond:{q:'主の絆',t:'名を授かりし者',fx:'致死ダメージをHP1で1回耐える',ic:'📛'},
+ tonton:{q:'ブタの恩返し',t:'トントンの加護',fx:'後半ステージの「謎の攻撃」を無効化',ic:'🐷'},
  revive:{q:'死線を越えし者',t:'黄泉還り',fx:'最大HP 2.0倍（増えた分は黄色のゲージ・蘇りマーク付き）',ic:'👼'}
 };
+const qc=k=>(S.cnt||{})[k]||0;
+function qCnt(k,n){S.cnt=S.cnt||{};S.cnt[k]=(S.cnt[k]||0)+(n||1)}
+const dexTotal=()=>{let c=0;for(const n in S.dex||{})for(const st in S.dex[n])if(S.dex[n][st]>=1)c++;return c};
 const qMax=k=>fieldMons().reduce((a,m)=>Math.max(a,m[k]||0),0);
 const MISSIONS=[
- {id:'m1',n:'ステージ1「はじまりの草原」をクリア',ok:()=>S.qc>=1,r:{coin:300}},
+// ---- クエスト ----
+ {cat:'クエスト',id:'m1',n:'ステージ1「はじまりの草原」をクリア',ok:()=>S.qc>=1,r:{coin:300}},
  {id:'m2',n:'デッキに3体編成する',ok:()=>deckMons().length>=3,r:{gem:5}},
  {id:'m3',n:'キャラをなでて絆Lv.3にする',ok:()=>qMax('bond')>=3,r:{coin:500}},
  {id:'m4',n:'キャラをLv.10にする',ok:()=>qMax('lv')>=10,r:{gem:6}},
@@ -780,6 +787,28 @@ const MISSIONS=[
  {id:'m13',n:'キャラをLv.100にする',ok:()=>qMax('lv')>=100,r:{gem:600}},
  {id:'m14',n:'最終ボス「悪夢の李徴」を討伐',ok:()=>S.qc>=31,r:{gem:1000}}
 ];
+// ---- 回数ミッション（報酬はコイン）：[id, 種類, 内容, カウンター, 目標, コイン] ----
+[['f1','育成','ご飯をあげる','feed',1,100],['f10','育成','ご飯をあげる','feed',10,500],['f50','育成','ご飯をあげる','feed',50,2000],['f200','育成','ご飯をあげる','feed',200,8000],
+ ['p1','育成','キャラをなでる','pet',1,100],['p30','育成','キャラをなでる','pet',30,1500],['p100','育成','キャラをなでる','pet',100,5000],
+ ['x1','育成','XPポーションを使う','pot',1,200],['x20','育成','XPポーションを使う','pot',20,2000],
+ ['h1','育成','たまごをふ化させる','hatch',1,200],['h10','育成','たまごをふ化させる','hatch',10,1500],['h50','育成','たまごをふ化させる','hatch',50,6000],
+ ['e1','育成','キャラを進化させる（成体・神族）','evo',1,300],['e10','育成','キャラを進化させる（成体・神族）','evo',10,3000],
+ ['n1','育成','キャラに名前を付ける','name',1,300],['n5','育成','キャラに名前を付ける','name',5,2000],
+ ['g1','育成','ミニゲームで遊ぶ','mg',1,200],['g10','育成','ミニゲームで遊ぶ','mg',10,1500],['g50','育成','ミニゲームで遊ぶ','mg',50,6000],
+ ['mv1','コロニー','キャラをコロニー移動させる','move',1,200],['mv10','コロニー','キャラをコロニー移動させる','move',10,1000],['mv50','コロニー','キャラをコロニー移動させる','move',50,5000],
+ ['sw1','コロニー','コロニーを切り替える','sw',1,100],['sw30','コロニー','コロニーを切り替える','sw',30,1500],
+ ['c1','コロニー','宝箱を開ける','chest',1,300],['c10','コロニー','宝箱を開ける','chest',10,3000],
+ ['b1','ショップ','たまごを買う','egg',1,100],['b10','ショップ','たまごを買う','egg',10,1000],['b50','ショップ','たまごを買う','egg',50,5000],['b100','ショップ','たまごを買う','egg',100,10000],
+ ['i1','ショップ','アイテムを買う','buy',1,100],['i20','ショップ','アイテムを買う','buy',20,2000],
+ ['nm1','あやしい','悪夢の料理を食べさせる','nm',1,500],['nm5','あやしい','悪夢の料理を食べさせる','nm',5,3000],
+ ['ck1','あやしい','神族を調理する','cook',1,500],['cko','あやしい','オケアノを調理する','cookO',1,1000],['ckt','あやしい','トントンを調理する','cookT',1,1000],
+ ['r1','あやしい','キャラを蘇生する','rev',1,500],['r5','あやしい','キャラを蘇生する','rev',5,3000],
+ ['s1','あやしい','奇跡の欠片を使う','shard',1,1000]
+].forEach(([id,cat,n,k,g,coin])=>MISSIONS.push({cat,id:'c_'+id,n:`${n}（${g}回）`,ok:()=>qc(k)>=g,p:()=>[Math.min(qc(k),g),g],r:{coin}}));
+[[5,500],[15,2000],[30,5000],[60,12000],[100,25000]].forEach(([g,coin])=>MISSIONS.push({cat:'図鑑',id:'c_dex'+g,n:`図鑑に${g}件登録する`,ok:()=>dexTotal()>=g,p:()=>[Math.min(dexTotal(),g),g],r:{coin}}));
+MISSIONS.push({cat:'コロニー',id:'c_col2',n:'第2コロニーを手に入れる',ok:()=>!!S.alt,r:{coin:3000}});
+MISSIONS.push({cat:'図鑑',id:'c_dexall',n:'図鑑をすべて登録する',ok:()=>dexTotal()>=SPECIES.length*4,p:()=>[Math.min(dexTotal(),SPECIES.length*4),SPECIES.length*4],r:{coin:100000}});
+
 
 /* ---------- 共通 ---------- */
 function fieldMons(){return [...S.mons,...(S.alt?S.alt.mons:[])]}
@@ -838,14 +867,14 @@ function petLeft(m){return m.bd===qToday()?QC.BOND_DAY-(m.bn||0):QC.BOND_DAY}
 function petMon(){const m=cur();if(!m||m.dead||m.stage==='egg')return;m.bond=m.bond||0;
  if(m.bond>=QC.BOND_MAX)return msg('絆レベルは最大です');
  if(m.bd!==qToday()){m.bd=qToday();m.bn=0}
- if(m.bn>=QC.BOND_DAY)return msg('今日はもう十分なかよくなった。また明日！');
- m.bn++;m.bond++;let t=`${nmOf(m)}をなでた！ 絆Lv.${m.bond}`;
+ if(m.bn>=QC.BOND_DAY&&!isGM())return msg('今日はもう十分なかよくなった。また明日！');   // GMは1日の回数制限なし
+ m.bn++;m.bond++;qCnt('pet');let t=`${nmOf(m)}をなでた！ 絆Lv.${m.bond}`;
  if(m.bond%QC.BOND_STEP===0){const k=['hp','atk','def'][Math.floor(Math.random()*3)];m.bs=m.bs||{};m.bs[k]=(m.bs[k]||0)+QC.BOND_BONUS;t+=`　💞絆ボーナス！ ${SN[k]}+${QC.BOND_BONUS}`;m.flash=1.2}
  fxQ.push({m,k:'egg'});act(t)}
 
 /* ---------- 凸（限界突破） ---------- */
 function shardLB(){const m=cur();if(!m||!(S.shard>0))return;m.lb=m.lb||0;if(m.lb>=QC.LB_MAX)return msg('最大まで凸しています');
- ask(`奇跡の欠片を1つ使って、${nmOf(m)}を1凸しますか？（所持 ${S.shard}）`,'使う',()=>{S.shard--;m.lb++;S.lbc=(S.lbc||0)+1;m.flash=2;fxQ.push({m,k:'god'});evo(m);act(`💎 奇跡の欠片で${nmOf(m)}が${m.lb}凸！ 神族のレベル上限 Lv.${Math.min(C.LV.max,C.LV.cap+m.lb)}`)})}
+ ask(`奇跡の欠片を1つ使って、${nmOf(m)}を1凸しますか？（所持 ${S.shard}）`,'使う',()=>{S.shard--;qCnt('shard');m.lb++;S.lbc=(S.lbc||0)+1;m.flash=2;fxQ.push({m,k:'god'});evo(m);act(`💎 奇跡の欠片で${nmOf(m)}が${m.lb}凸！ 神族のレベル上限 Lv.${Math.min(C.LV.max,C.LV.cap+m.lb)}`)})}
 function lbMats(m){return allMons().filter(x=>x!==m&&x.sp===m.sp&&(x.rar||0)===(m.rar||0)&&!x.nick&&!S.deck.includes(x.id))
  .sort((a,b)=>ST.indexOf(a.stage)-ST.indexOf(b.stage)||(a.lv||0)-(b.lv||0))}
 function limitBreak(){const m=cur();if(!m)return;m.lb=m.lb||0;if(m.lb>=QC.LB_MAX)return msg('最大まで凸しています');
@@ -858,22 +887,22 @@ function limitBreak(){const m=cur();if(!m)return;m.lb=m.lb||0;if(m.lb>=QC.LB_MAX
 const _qUi=ui;
 ui=function(){qInit();_qUi();qBadge();const m=cur();if(!m)return;const st=statsOf(m),need=QC.LB_NEED[m.rar||0],n=Math.min(need,lbMats(m).length);
  let h=`<div class="qx">${roleTag(m)} HP ${st.hp}・攻 ${st.atk}・防 ${st.def}・速 ${st.as}/秒<br>💞 絆Lv.${m.bond||0}/${QC.BOND_MAX}　⭐ ${m.lb||0}/${QC.LB_MAX}凸</div>`;
- if(!m.dead)h+=`<div>${m.stage!=='egg'?`<button onclick="petMon()" ${petLeft(m)<1||(m.bond||0)>=QC.BOND_MAX?'disabled':''}>🤝 なでる（今日あと${Math.max(0,petLeft(m))}回）</button>`:''}<button onclick="limitBreak()" ${(m.lb||0)>=QC.LB_MAX?'disabled':''}>⭐ 凸（素材 ${n}/${need}）</button>${S.shard>0?`<button onclick="shardLB()" ${(m.lb||0)>=QC.LB_MAX?'disabled':''}>${ic('shard')}欠片で凸（${S.shard}）</button>`:''}</div>`;
- if(isGM())h+=`<div class="dev">GM：<button onclick="gmMove100()">🌗 50回移動済みにする</button>（移動 ${m.mv||0}回）</div>`;
+ if(!m.dead)h+=`<div>${m.stage!=='egg'?`<button onclick="petMon()" ${(petLeft(m)<1&&!isGM())||(m.bond||0)>=QC.BOND_MAX?'disabled':''}>🤝 なでる（${isGM()?'GM：無制限':'今日あと'+Math.max(0,petLeft(m))+'回'}）</button>`:''}<button onclick="limitBreak()" ${(m.lb||0)>=QC.LB_MAX?'disabled':''}>⭐ 凸（素材 ${n}/${need}）</button>${S.shard>0?`<button onclick="shardLB()" ${(m.lb||0)>=QC.LB_MAX?'disabled':''}>${ic('shard')}欠片で凸（${S.shard}）</button>`:''}</div>`;
+ if(isGM())h+=`<div class="dev">GM：<button onclick="gmMove100()">🌗 10回移動済みにする</button>（移動 ${m.mv||0}回）</div>`;
  $('panel').insertAdjacentHTML('beforeend',h)};
 
 /* ---------- 隠しクエスト（裏カウント・非表示） ---------- */
 // 称号はキャラごと。そのキャラ自身が隠しクエストを達成したときだけ付く（同じ称号は重複しない）
 const hasT=(m,k)=>!!(m&&m.titles&&m.titles[k]);
 function hqCheck(){qInit();allMons().forEach(m=>{
- if((m.mv||0)>=QC.HQ_MOVE)qGrant(m,'wander');      // そのキャラがコロニー間を50回移動
+ if((m.mv||0)>=QC.HQ_MOVE)qGrant(m,'wander');      // そのキャラがコロニー間を10回移動
  if(m.nick)qGrant(m,'bond');                        // そのキャラに名前を付けた
- if((m.rv||0)>=QC.HQ_REVIVE)qGrant(m,'revive')})}  // 同じキャラを3回蘇生（3回目に蘇生したそのキャラだけ）
+ if((m.rv||0)>=QC.HQ_REVIVE)qGrant(m,'revive')})}  // 同じキャラを2回蘇生（2回目に蘇生したそのキャラだけ）
 function qGrant(m,k){if(hasT(m,k))return;m.titles=m.titles||{};m.titles[k]=Date.now();save();qPopShow(k,m)}
 const _qSw=switchCol;switchCol=function(){const a=S.cur;_qSw();if(S.cur!==a){qInit();S.hq.mv++;hqCheck();save()}};
 const _qMv=moveCol;moveCol=function(){const m=cur(),n=S.mons.length;_qMv();if(S.mons.length<n){qInit();S.hq.mv++;if(m)m.mv=(m.mv||0)+1;hqCheck();save()}};
-// GM専用：選んだキャラを「コロニー間を50回移動し終えた」状態にする
-function gmMove100(){if(!isGM())return;const m=cur();if(!m)return;qInit();m.mv=Math.max(m.mv||0,QC.HQ_MOVE);act(`GM：${nmOf(m)}を50回移動済みにした`);hqCheck()}
+// GM専用：選んだキャラを「コロニー間を10回移動し終えた」状態にする
+function gmMove100(){if(!isGM())return;const m=cur();if(!m)return;qInit();m.mv=Math.max(m.mv||0,QC.HQ_MOVE);act(`GM：${nmOf(m)}を10回移動済みにした`);hqCheck()}
 const _qRv=revive;revive=function(){const m=cur(),d=m&&m.dead;_qRv();if(d&&!m.dead){qInit();S.hq.rv++;m.rv=(m.rv||0)+1;hqCheck();save()}};
 const _qNk=nickOk;nickOk=function(){_qNk();hqCheck()};
 
@@ -887,11 +916,12 @@ function qPopNext(){const it=qPopQ[0];if(!it)return;const k=it.k,m=it.m,T=TITLES
 
 /* ---------- バトル計算 ---------- */
 function qUnitP(m,i){const s=statsOf(m),T=m.titles||{};let hp=s.hp;if(T.revive)hp*=2;const as=s.as*(T.wander?1.5:1);
- return {key:'p'+i,side:0,sp:m.sp,st:m.stage,bhp:s.hp,role:roleOf(m),n:nmOf(m),max:hp,hp,atk:s.atk,def:s.def,as,nx:T.wander?0:1/as,endure:!!T.bond,rev:!!T.revive}}
+ return {key:'p'+i,side:0,sp:m.sp,st:m.stage,bhp:s.hp,role:roleOf(m),ton:!!T.tonton,n:nmOf(m),max:hp,hp,atk:s.atk,def:s.def,as,nx:T.wander?0:1/as,endure:!!T.bond,rev:!!T.revive}}
 function qUnitE(e,i){return {key:'e'+i,side:1,en:e[0],n:ENM[e[0]],max:e[1],hp:e[1],bhp:e[1],atk:e[2],def:e[3],as:e[4],nx:1/e[4],g:e[5]||[]}}
 function qSim(q,P){const E=q.e.map(qUnitE),L=[],dt=.05,al=a=>a.filter(u=>u.hp>0),gs=E.flatMap(e=>e.g);if(q.boss&&E[0])E[0].boss=true;
  const both=gs.includes('kill')&&gs.includes('poison'),pd=d=>q.burn?Math.max(1,Math.round(d.bhp*q.burn[0]*Math.exp(-t/q.burn[1]))):QC.POISON; // burn=[初期の割合/秒, 弱まる速さ(秒)]
  let pre=gs.includes('pre')?QC.PRE_AT:-1,ke=q.ke||QC.KILL_EVERY,kill=gs.includes('kill')?ke:-1,poi=gs.includes('poison')?1:-1,acted=false,t=0,win=null;
+ if(q.nazo){L.push({t:0,k:'nazo'});P.forEach(d=>{if(d.ton)L.push({t:0,k:'block',d:d.key});else{const v=Math.round(d.max*QC.NAZO);d.hp=Math.max(1,d.hp-v);L.push({t:0,k:'nz',d:d.key,v,hp:d.hp})}})}
  const hit=(s,d,v,k)=>{if(d.hp-v<=0&&d.endure&&k!=='pre'){d.endure=false;d.hp=1;d.pim=both;L.push({t,k:'endure',s:s&&s.key,d:d.key,v,hp:1});return}
   d.hp=Math.max(0,d.hp-v);L.push({t,k,s:s&&s.key,d:d.key,v,hp:d.hp})};
  for(;t<=QC.TIME_LIMIT;t=Math.round((t+dt)*100)/100){
@@ -926,7 +956,7 @@ function qUI(){const tabs={quest:'⚔️ クエスト',deck:'🃏 デッキ',mis
   h+=`<div class="qdk">デッキ：${d.length?d.map(m=>`<span>${qImgM(m,'qmini')}${nmOf(m)}</span>`).join(''):'未編成（デッキタブで編成）'}</div>`;
   QUESTS.forEach((q,i)=>{const lock=i>S.qc,clr=i<S.qc;
    if(q.ch)h+=`<div class="qch">${q.ch}</div>`;
-   h+=`<div class="qrow2 ${q.boss?'qboss':''}"><div><b>${i+1}. ${lock?'？？？':q.n}</b>${clr?' ✅':''}<br><small>${lock?'前のステージをクリアすると解放':`<span class="qens">${q.e.map(e=>qEImg(e[0],'qmini')).join('')}</span>${q.hint?q.hint+'<br>':''}${clr?(()=>{const r=qRepeat(q),x=qRepXp(q);return Object.keys(r).length||x?'次の報酬 '+(Object.keys(r).length?qR(r):'')+' / XP+'+x:'もう報酬はもらえません'})():'初回 '+qR(qFirst(q))+' / XP+'+q.xp}`}</small></div>
+   h+=`<div class="qrow2 ${q.boss?'qboss':''}"><div><b>${i+1}. ${lock?'？？？':q.n}</b>${clr?' ✅':''}<br><small>${lock?'前のステージをクリアすると解放':`<span class="qens">${q.e.map(e=>qEImg(e[0],'qmini')).join('')}</span>${q.nazo&&!lock?'<span style="color:#c084fc">❓謎の攻撃あり</span> ':''}${q.hint?q.hint+'<br>':''}${clr?(()=>{const r=qRepeat(q),x=qRepXp(q);return Object.keys(r).length||x?'次の報酬 '+(Object.keys(r).length?qR(r):'')+' / XP+'+x:'もう報酬はもらえません'})():'初回 '+qR(qFirst(q))+' / XP+'+q.xp}`}</small></div>
    <button onclick="qStart(${i})" ${lock||!d.length||S.st<qCost(i)?'disabled':''}>挑戦<br><small>⚡${qCost(i)}</small></button></div>`})}
  if(qTab==='deck'){
   h+=`<div class="dev">最大${QC.DECK_MAX}体・同名キャラは1体まで。キャラをタップすると詳しく見られます</div><div class="qslots">${Array.from({length:QC.DECK_MAX},(_,k)=>{const m=d[k];
@@ -935,8 +965,8 @@ function qUI(){const tabs={quest:'⚔️ クエスト',deck:'🃏 デッキ',mis
   h+=`<div class="qgrid">${list.map(m=>{const k=S.deck.indexOf(m.id),dup=k<0&&d.some(x=>x.sp===m.sp),R=C.RARITY[m.rar||0];
    return `<div class="qcard ${k>=0?'qon':''} ${dup?'qdup':''}" style="border-color:${R.col}" onclick="qDet(${m.id})">${k>=0?`<b class="qnum">${k+1}</b>`:''}<span class="qri">${ROLES[roleOf(m)].ic}</span>${m.titles?`<span class="qti">${Object.keys(m.titles).map(k=>TITLES[k].ic).join('')}</span>`:''}${qImgM(m)}<div class="qcn">${nmOf(m)}</div><div class="qlv">Lv.${m.lv||0}</div></div>`}).join('')||'<div class="dev" style="grid-column:1/-1">編成できるキャラがいません</div>'}</div>`}
  if(qTab==='mission'){
-  MISSIONS.forEach(x=>{const got=S.ms[x.id],ok=x.ok();
-   h+=`<div class="qrow2"><div>${got?'✅':ok?'🎁':'⬜'} ${x.n}<br><small>報酬 ${qR(x.r)}</small></div><button onclick="qClaim('${x.id}')" ${got||!ok?'disabled':''}>${got?'受取済':'受け取る'}</button></div>`})}
+  let cat='';MISSIONS.forEach(x=>{const got=S.ms[x.id],ok=x.ok(),c=x.cat||'クエスト',pr=x.p&&!got?x.p():null;if(c!==cat){cat=c;h+=`<div class="qch">${c}</div>`}
+   h+=`<div class="qrow2"><div>${got?'✅':ok?'🎁':'⬜'} ${x.n}${pr?` <small style="color:#ffe08a">${pr[0]}/${pr[1]}</small>`:''}<br><small>報酬 ${qR(x.r)}</small></div><button onclick="qClaim('${x.id}')" ${got||!ok?'disabled':''}>${got?'受取済':'受け取る'}</button></div>`})}
  if(qTab==='title'){
   h+='<div class="dev">称号はキャラごとに付きます。隠しクエストを達成したキャラだけが、その効果をバトルで使えます</div>';
   Object.keys(TITLES).forEach(k=>{const T=TITLES[k],who=allMons().filter(m=>hasT(m,k));
@@ -986,6 +1016,8 @@ function qbAnim(c,cls){if(!c)return;c.classList.remove(cls);void c.offsetWidth;c
 let qPoiLog=false;
 function qbEv(ev){const U=qbR.U,n=k=>U[k]?U[k].n:'';
  if(ev.k==='pre'){qbLog('⚡ 目にもとまらぬ先制攻撃！');qbAnim($('qu_e0'),'qatkE');return}
+ if(ev.k==='nazo')return qbLog('❓ どこからともなく謎の攻撃！ 体力が2割けずられた');
+ if(ev.k==='block'){qbLog('🐷 トントンの加護が謎の攻撃をふせいだ！');const c=$('qu_'+ev.d);if(c){const f=document.createElement('span');f.className='qfl qhe';f.textContent='無効';c.appendChild(f);setTimeout(()=>f.remove(),750)}return}
  if(ev.k==='cancel')return qbLog('🌗 黄昏の素早さで先に動き、先制攻撃を阻止した！');
  if(ev.k==='reap'){qbLog(`☠️ 即死攻撃が${n(ev.d)}をおそう！`);qbAnim($('qu_e0'),'qatkE');return}
  if(ev.k==='endure')qbLog(`📛 ${n(ev.d)}は名の力で踏みとどまった！${qbR.q.e[0][5]&&qbR.q.e[0][5].length>2?'（瘴気もはらった）':''}`);
@@ -993,12 +1025,31 @@ function qbEv(ev){const U=qbR.U,n=k=>U[k]?U[k].n:'';
  const src=ev.s&&(ev.k==='hit'||ev.k==='heal')?U[ev.s]:null;
  if(src)qbAnim($('qu_'+ev.s),src.side?'qatkE':'qatkP');            // 攻撃するキャラがぴょんと跳ねる
  const hitNow=()=>{qbHp(ev.d,ev.hp);const c=$('qu_'+ev.d);if(!c||ev.v==null)return;qbAnim(c,'qhit');
-  const f=document.createElement('span');f.className='qfl'+(ev.k==='heal'?' qhe':ev.k==='poison'?' qpo':ev.k==='hit'?'':' qbig');f.textContent=ev.k==='heal'?'+'+ev.v:ev.k==='endure'?'耐えた！':ev.v>=99999?'即死':'-'+ev.v;c.appendChild(f);setTimeout(()=>f.remove(),750)};
+  const f=document.createElement('span');f.className='qfl'+(ev.k==='heal'?' qhe':ev.k==='poison'||ev.k==='nz'?' qpo':ev.k==='hit'?'':' qbig');f.textContent=ev.k==='heal'?'+'+ev.v:ev.k==='endure'?'耐えた！':ev.v>=99999?'即死':'-'+ev.v;c.appendChild(f);setTimeout(()=>f.remove(),750)};
  if(src)qbT.push(setTimeout(hitNow,170));else hitNow()}               // 跳ねて着地した瞬間にダメージ
 function qbSkip(){qbT.forEach(clearTimeout);qbT=[];Object.values(qbR.U).forEach(u=>qbHp(u.key,u.hp));qbEnd()}
 function qbEnd(){qbT.forEach(clearTimeout);qbT=[];qPoiLog=false;const {R,rw}=qbR,r=$('qbr'),s=$('qbs');if(!r)return;if(s)s.style.visibility='hidden';
  r.innerHTML=`<div class="qres">${R.win?`<div class="qwin">🎉 勝利！</div><div>${rw}</div>`:`<div class="qlose">${R.timeout?'⌛ 時間切れ…':'💀 敗北…'}</div><div><small>キャラを育てたり、デッキを見直そう</small></div>`}<button onclick="qbClose()">とじる</button></div>`}
 function qbClose(){qbT.forEach(clearTimeout);qbT=[];$('qb').style.display='none';act();openQuest()}
+
+/* ---------- ミッション用カウンター（既存の処理を包んで回数を数える） ---------- */
+{const o=feed;feed=function(i){const m=cur(),b=m&&m.hunger;o(i);if(m&&m.hunger!==b)qCnt('feed')}}
+{const o=eatNm;eatNm=function(){const b=S.nm;o();if(S.nm<b)qCnt('nm')}}
+{const o=usePotion;usePotion=function(){const b=S.xp;o();if(S.xp<b)qCnt('pot')}}
+{const o=pullEgg;pullEgg=function(){qCnt('egg');return o()}}
+{const o=buyEgg;buyEgg=function(mode){const b=S.box.length;o(mode);if(mode==='pick'&&S.box.length>b)qCnt('egg')}}
+{const o=hatchCheck;hatchCheck=function(m){const w=m.stage==='egg';o(m);if(w&&m.stage!=='egg')qCnt('hatch')}}
+{const o=evo;evo=function(m){const a=m.stage;o(m);if(m.stage!==a&&m.stage!=='baby')qCnt('evo')}}
+{const o=endMG;endMG=function(){const d=G.done;o();if(!d&&G.done)qCnt('mg')}}
+{const o=nickOk;nickOk=function(){const m=S.mons.find(x=>String(x.id)===String(S.nk)),b=m&&m.nick;o();if(m&&m.nick&&m.nick!==b)qCnt('name')}}
+{const o=revive;revive=function(){const m=cur(),d=m&&m.dead;o();if(d&&!m.dead)qCnt('rev')}}
+{const o=moveCol;moveCol=function(){const n=S.mons.length;o();if(S.mons.length<n)qCnt('move')}}
+{const o=switchCol;switchCol=function(){const a=S.cur;o();if(S.cur!==a)qCnt('sw')}}
+{const o=buyItem;buyItem=function(id){const b=S[id];o(id);if(S[id]>b)qCnt('buy')}}
+{const o=openChest;openChest=function(){const b=S.chest;o();if(b&&!S.chest)qCnt('chest')}}
+// 神族の調理：トントンを調理すると、食べたキャラ全員に称号「トントンの加護」
+{const o=cook;cook=function(){const m=cur();if(!m)return o();const sp=SPECIES[m.sp].n,eat=S.mons.filter(x=>x!==m&&!x.dead&&x.stage!=='egg');o();
+ if(S.mons.includes(m))return;qCnt('cook');if(sp==='オケアノ')qCnt('cookO');if(sp==='トントン'){qCnt('cookT');eat.forEach(x=>qGrant(x,'tonton'))}}}
 
 /* ---------- 起動 ---------- */
 {const b=document.querySelector('[onclick="questInfo()"]');if(b){b.setAttribute('onclick','openQuest()');b.innerHTML='🚪 クエスト<span id="qbadge"></span>'}}
