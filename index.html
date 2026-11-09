@@ -183,10 +183,11 @@ function bringInfo(m){const sp=SPECIES[m.sp],mu=C.RARITY[m.rar||0].mult,egg=m.st
  if(egg)return `持ってくるアイテム（ふ化後）: ${t}`;
  if(m.dead)return `持ってくるアイテム: ${t}（死亡中は持ってきません）`;
  return `持ってくるアイテム: ${t}${m.hunger===0?'（満腹度0のあいだは持ってきません）':''}`}
-const eggH=m=>C.RARITY[m.rar||0].egg;
+const eco=m=>m.titles&&m.titles.eco?.5:1;   // 称号「省エネ優等生」：ふ化時間と必要XPが半分
+const eggH=m=>C.RARITY[m.rar||0].egg*eco(m);
 const lvCap=m=>m.stage==='god'?Math.min(C.LV.max,C.LV.cap+(m.lb||0)):m.stage==='adult'?C.LV.god:m.stage==='baby'?C.LV.adult:0;
 const lvMul=m=>{const l=m.lv||0;if(m.stage!=='god')return 1;return l<C.LV.cap?1+(l-C.LV.god)/40:2+(l-C.LV.cap+1)*.5};   // 神族はLvが上がるほど重く、凸で開くLv91〜100はさらに重い
-const needXp=m=>{if(m.stage==='egg'||(m.lv||0)>=lvCap(m))return 0;return Math.round(C.LV_XP[m.stage]*C.RARITY[m.rar||0].xpm*lvMul(m))};
+const needXp=m=>{if(m.stage==='egg'||(m.lv||0)>=lvCap(m))return 0;return Math.max(1,Math.round(C.LV_XP[m.stage]*C.RARITY[m.rar||0].xpm*lvMul(m)*eco(m)))};
 function lvFix(m){if(m.lv!=null)return;if(m.stage==='egg'){m.lv=0;return}const per=Math.round(C.LV_XP[m.stage]*C.RARITY[m.rar||0].xpm),b=C.LV[m.stage];
  if(m.stage==='god'){m.lv=b;m.exp=0;return}const a=Math.floor((m.exp||0)/per);m.lv=Math.min(b+a,lvCap(m)-1);m.exp=a>=lvCap(m)-b?0:(m.exp||0)%per}
 const sellPrice=m=>SPECIES[m.sp].sell||Math.round(C.SELL[m.stage]*C.RARITY[m.rar||0].mult);
@@ -716,7 +717,7 @@ const QC={
  ST_BUY:{n:5,coin:1000,gem:100,stone:100}, // 体力5回復の値段
  NAZO:0.2,
  CURSE:0.5,                           // 操られた王様の呪い：もとの最大HPの50%（黄泉還りで増えた分は対象外）                            // 謎の攻撃：最大HPの2割
- BORN_P:0.01,                         // 召喚したキャラに「撫でられ上手」「規格外の遺伝子」がそれぞれ付く確率（どのレア度でも）
+ BORN_P:0.01,                         // 召喚したキャラに「撫でられ上手」「規格外の遺伝子」「省エネ優等生」がそれぞれ付く確率（どのレア度でも）
  NM_DROP:0.01,                        // クエストクリアのたびに「悪夢の料理」が落ちる確率
  REPEAT_DECAY:0.7,                    // 3回目以降は、クリアするたびに前回の0.7倍に減っていく              // バトルの制限時間(秒) / 再生速度
  PRE_AT:0.15, KILL_EVERY:4, POISON:60 // ボスギミック：先制の発動時刻 / 即死の間隔(秒) / 毒ダメージ(毎秒・防御無視)
@@ -767,6 +768,7 @@ const TITLES={
  wander:{q:'昼夜を彷徨うもの',t:'黄昏の放浪者',fx:'素早さ・攻撃速度 +50%（先制攻撃より先に動く）',ic:'🌗'},
  bond:{q:'主の絆',t:'名を授かりし者',fx:'致死ダメージをHP1で1回耐える',ic:'📛'},
  pet:{q:'召喚ボーナス',born:1,t:'撫でられ上手',fx:'1日に10回なでられる（ふつうは3回）',ic:'💞'},
+ eco:{q:'召喚ボーナス',born:1,t:'省エネ優等生',fx:'ふ化時間と必要XPが半分',ic:'🌱'},
  gene:{q:'召喚ボーナス',born:1,t:'規格外の遺伝子',fx:'生まれたときから完凸（10凸）',ic:'🧬'},
  tonton:{q:'ブタの恩返し',t:'トントンの加護',fx:'後半ステージの「謎の攻撃」を無効化',ic:'🐷'},
  revive:{q:'死線を越えし者',t:'黄泉還り',fx:'最大HP 2.0倍（増えた分は黄色のゲージ・蘇りマーク付き）',ic:'👼'}
@@ -813,6 +815,22 @@ const MISSIONS=[
  ['s1','あやしい','奇跡の欠片を使う','shard',1,1000]
 ].forEach(([id,cat,n,k,g,coin])=>MISSIONS.push({cat,id:'c_'+id,n:`${n}（${g}回）`,ok:()=>qc(k)>=g,p:()=>[Math.min(qc(k),g),g],r:{coin}}));
 [[5,500],[15,2000],[30,5000],[60,12000],[100,25000]].forEach(([g,coin])=>MISSIONS.push({cat:'図鑑',id:'c_dex'+g,n:`図鑑に${g}件登録する`,ok:()=>dexTotal()>=g,p:()=>[Math.min(dexTotal(),g),g],r:{coin}}));
+// ---- 称号・やりこみミッション ----
+{const tk=m=>Object.keys(m.titles||{}),withT=()=>allMons().filter(m=>tk(m).length),kinds=()=>new Set(allMons().flatMap(tk)).size,
+  hidden=()=>new Set(allMons().flatMap(tk).filter(k=>!TITLES[k].born)).size,maxT=()=>allMons().reduce((a,m)=>Math.max(a,tk(m).length),0),
+  totT=()=>allMons().reduce((a,m)=>a+tk(m).length,0),deckT=()=>deckMons().filter(m=>tk(m).length).length,
+  full=()=>fieldMons().filter(m=>(m.lb||0)>=QC.LB_MAX).length,NT=Object.keys(TITLES).length;
+ [['t_h1','隠しクエストを1つ達成する',()=>hidden(),1,1000],['t_h3','隠しクエストを3種類達成する',()=>hidden(),3,5000],['t_hall','隠しクエストをすべて達成する',()=>hidden(),Object.values(TITLES).filter(T=>!T.born).length,20000],
+  ['t_w1','称号を持つキャラを1匹そだてる',()=>withT().length,1,500],['t_w5','称号を持つキャラを5匹そだてる',()=>withT().length,5,3000],['t_w10','称号を持つキャラを10匹そだてる',()=>withT().length,10,8000],
+  ['t_s10','称号を合計10個集める',()=>totT(),10,4000],['t_s30','称号を合計30個集める',()=>totT(),30,12000],
+  ['t_m2','1匹に称号を2つ付ける',()=>maxT(),2,2000],['t_m4','1匹に称号を4つ付ける',()=>maxT(),4,8000],['t_m6','1匹に称号を6つ付ける',()=>maxT(),6,30000],
+  ['t_k','すべての種類の称号を集める',()=>kinds(),NT,50000],
+  ['t_b1','召喚で称号持ちを引き当てる',()=>qc('born'),1,3000],['t_b5','召喚で称号持ちを5回引き当てる',()=>qc('born'),5,15000],['t_bw','召喚で称号を2つ持つキャラを引き当てる',()=>qc('born2'),1,30000],
+  ['t_d3','称号持ちを3匹デッキに入れる',()=>deckT(),3,2000],['t_d6','デッキ全員を称号持ちにする',()=>deckT(),6,6000],
+  ['y_lb1','完凸のキャラを1匹そだてる',()=>full(),1,5000],['y_lb6','完凸のキャラを6匹そだてる',()=>full(),6,25000],
+  ['y_bd50','絆Lv.50にする',()=>qMax('bond'),50,5000],['y_bd100','絆Lv.100にする',()=>qMax('bond'),100,15000],
+  ['y_sh5','奇跡の欠片を5回使う',()=>qc('shard'),5,8000]
+ ].forEach(([id,n,f,g,coin])=>MISSIONS.push({cat:id[0]==='t'?'称号':'やりこみ',id:'c_'+id,n,ok:()=>f()>=g,p:()=>[Math.min(f(),g),g],r:{coin}}))}
 MISSIONS.push({cat:'コロニー',id:'c_col2',n:'第2コロニーを手に入れる',ok:()=>!!S.alt,r:{coin:3000}});
 MISSIONS.push({cat:'図鑑',id:'c_dexall',n:'図鑑をすべて登録する',ok:()=>dexTotal()>=SPECIES.length*4,p:()=>[Math.min(dexTotal(),SPECIES.length*4),SPECIES.length*4],r:{coin:100000}});
 
@@ -841,7 +859,7 @@ function qCost(i){const q=QUESTS[i];if(i===QUESTS.length-1)return 5;const late=i
 function stTick(){qInit();if(S.st>=QC.ST_MAX){S.stT=now();return}const n=Math.floor((now()-S.stT)/QC.ST_REGEN);if(n>0){S.st=Math.min(QC.ST_MAX,S.st+n);S.stT+=n*QC.ST_REGEN;if(S.st>=QC.ST_MAX)S.stT=now()}}
 function stNext(){return S.st>=QC.ST_MAX?0:Math.max(0,Math.ceil((S.stT+QC.ST_REGEN-now())/60))}
 function stBuy(){stTick();const B=QC.ST_BUY;if(S.coin<B.coin||S.gem<B.gem||S.stone<B.stone)return msg('コイン・宝石・魔石が足りません');
- ask(`体力を${B.n}回復しますか？（コイン${B.coin}・宝石${B.gem}・魔石${B.stone}）`,'回復する',()=>{S.coin-=B.coin;S.gem-=B.gem;S.stone-=B.stone;S.st+=B.n;act(`⚡ 体力が${B.n}回復した！（${S.st}/${QC.ST_MAX}）`);qUI()})}
+ S.coin-=B.coin;S.gem-=B.gem;S.stone-=B.stone;S.st+=B.n;act(`⚡ 体力が${B.n}回復した！（${S.st}/${QC.ST_MAX}）`);qUI()}
 setInterval(()=>{try{if(!S)return;stTick();if($('qm')&&$('qm').style.display==='flex'&&qTab==='quest')qUI()}catch(e){}},30000);
 function qGive(r){for(const k in r)S[k]=(S[k]||0)+r[k]}
 function qInit(){if(S.st==null){S.st=QC.ST_MAX;S.stT=now()}S.hq=S.hq||{mv:0,rv:0};S.titles=S.titles||{};S.ms=S.ms||{};S.deck=S.deck||[];S.qc=S.qc||0}
@@ -984,7 +1002,9 @@ function qUI(){const tabs={quest:'⚔️ クエスト',deck:'🃏 デッキ',mis
   h+=`<div class="qgrid">${list.map(m=>{const k=S.deck.indexOf(m.id),dup=k<0&&d.some(x=>x.sp===m.sp),R=C.RARITY[m.rar||0];
    return `<div class="qcard ${k>=0?'qon':''} ${dup?'qdup':''}" style="border-color:${R.col}" onclick="qDet(${m.id})">${k>=0?`<b class="qnum">${k+1}</b>`:''}<span class="qri">${ROLES[roleOf(m)].ic}</span>${m.titles?`<span class="qti">${Object.keys(m.titles).map(k=>TITLES[k].ic).join('')}</span>`:''}${qImgM(m)}<div class="qcn">${nmOf(m)}</div><div class="qlv">Lv.${m.lv||0}</div></div>`}).join('')||'<div class="dev" style="grid-column:1/-1">編成できるキャラがいません</div>'}</div>`}
  if(qTab==='mission'){
-  let cat='';MISSIONS.forEach(x=>{const got=S.ms[x.id],ok=x.ok(),c=x.cat||'クエスト',pr=x.p&&!got?x.p():null;if(c!==cat){cat=c;h+=`<div class="qch">${c}</div>`}
+  {const n=MISSIONS.filter(x=>!S.ms[x.id]&&x.ok()).length;h+=`<div style="text-align:center;margin:4px 0"><button onclick="qClaimAll()" ${n?'':'disabled'}>🎁 全て受け取る${n?'（'+n+'個）':''}</button></div>`}
+  const CO=['クエスト','育成','コロニー','ショップ','図鑑','称号','やりこみ','あやしい'],ci=x=>CO.indexOf(x.cat||'クエスト');
+  let cat='';MISSIONS.map((x,i)=>[x,i]).sort((a,b)=>ci(a[0])-ci(b[0])||a[1]-b[1]).map(a=>a[0]).forEach(x=>{const got=S.ms[x.id],ok=x.ok(),c=x.cat||'クエスト',pr=x.p&&!got?x.p():null;if(c!==cat){cat=c;h+=`<div class="qch">${c}</div>`}
    h+=`<div class="qrow2"><div>${got?'✅':ok?'🎁':'⬜'} ${x.n}${pr?` <small style="color:#ffe08a">${pr[0]}/${pr[1]}</small>`:''}<br><small>報酬 ${qR(x.r)}</small></div><button onclick="qClaim('${x.id}')" ${got||!ok?'disabled':''}>${got?'受取済':'受け取る'}</button></div>`})}
  if(qTab==='title'){
   h+='<div class="dev">称号はキャラごとに付きます。隠しクエストを達成したキャラだけが、その効果をバトルで使えます</div>';
@@ -1007,6 +1027,7 @@ function qDeck(id){const m=fieldMons().find(x=>x.id===id);if(!m)return;
  if(S.deck.includes(id))S.deck=S.deck.filter(x=>x!==id);
  else{const d=deckMons();if(d.length>=QC.DECK_MAX)return msg('デッキがいっぱいです');if(d.some(x=>x.sp===m.sp))return msg('同名キャラは1体までです');S.deck.push(id)}
  save();qDetClose();qUI();qBadge()}
+function qClaimAll(){const L=MISSIONS.filter(x=>!S.ms[x.id]&&x.ok());if(!L.length)return;const tot={};L.forEach(x=>{S.ms[x.id]=1;qGive(x.r);for(const k in x.r)tot[k]=(tot[k]||0)+x.r[k]});act(`ミッション${L.length}個をまとめて受け取った！`);qUI();msg(`ミッション${L.length}個達成！ ${Object.keys(tot).map(k=>(k==='coin'?'コイン':k==='gem'?'宝石':k)+'+'+tot[k]).join('・')}`)}
 function qClaim(id){const x=MISSIONS.find(y=>y.id===id);if(!x||S.ms[id]||!x.ok())return;S.ms[id]=1;qGive(x.r);act('ミッション達成！ '+x.n);qUI()}
 
 /* ---------- バトル再生 ---------- */
@@ -1076,7 +1097,7 @@ function qbClose(){qbT.forEach(clearTimeout);qbT=[];$('qb').style.display='none'
 
 /* ---------- 召喚ボーナス称号（撫でられ上手・規格外の遺伝子）：それぞれ1%、両方つくことも ---------- */
 const qBornPend=[];
-function qBorn(e){if(!e||e.shard)return;['pet','gene'].forEach(k=>{if(Math.random()<QC.BORN_P){e.titles=e.titles||{};e.titles[k]=Date.now();if(k==='gene')e.lb=QC.LB_MAX;qBornPend.push([k,e])}})}
+function qBorn(e){if(!e||e.shard)return;let n=0;['pet','gene','eco'].forEach(k=>{if(Math.random()<QC.BORN_P){n++;e.titles=e.titles||{};e.titles[k]=Date.now();if(k==='gene')e.lb=QC.LB_MAX;qBornPend.push([k,e])}});if(n)qCnt('born');if(n>=2)qCnt('born2')}
 {const o=pullEgg;pullEgg=function(){const e=o();qBorn(e);return e}}
 {const o=buyEgg;buyEgg=function(mode){const b=S.box.length;if(mode==='pick'){const R=Math.random;o(mode);if(S.box.length>b)qBorn(S.box[S.box.length-1])}else o(mode)}}
 {const o=closeGet;closeGet=function(){o();if(qBornPend.length){save();qBornPend.splice(0).forEach(([k,e])=>qPopShow(k,e))}}}
