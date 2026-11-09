@@ -712,6 +712,7 @@ const QC={
  ST_MAX:10, ST_REGEN:3600,             // クエスト用の体力：最大10、1時間に1回復
  ST_BUY:{n:5,coin:10000,gem:100,stone:100}, // 体力5回復の値段
  NAZO:0.2,                            // 謎の攻撃：最大HPの2割
+ BORN_P:0.01,                         // 召喚したキャラに「撫でられ上手」「規格外の遺伝子」がそれぞれ付く確率（どのレア度でも）
  NM_DROP:0.01,                        // クエストクリアのたびに「悪夢の料理」が落ちる確率
  REPEAT_DECAY:0.7,                    // 3回目以降は、クリアするたびに前回の0.7倍に減っていく              // バトルの制限時間(秒) / 再生速度
  PRE_AT:0.15, KILL_EVERY:4, POISON:60 // ボスギミック：先制の発動時刻 / 即死の間隔(秒) / 毒ダメージ(毎秒・防御無視)
@@ -761,6 +762,8 @@ QUESTS.forEach((q,i)=>{if(i>=15)q.nazo=1});   // 後半（16面〜）：開始�
 const TITLES={
  wander:{q:'昼夜を彷徨うもの',t:'黄昏の放浪者',fx:'素早さ・攻撃速度 +50%（先制攻撃より先に動く）',ic:'🌗'},
  bond:{q:'主の絆',t:'名を授かりし者',fx:'致死ダメージをHP1で1回耐える',ic:'📛'},
+ pet:{q:'召喚ボーナス',born:1,t:'撫でられ上手',fx:'1日に10回なでられる（ふつうは3回）',ic:'💞'},
+ gene:{q:'召喚ボーナス',born:1,t:'規格外の遺伝子',fx:'生まれたときから完凸（10凸）',ic:'🧬'},
  tonton:{q:'ブタの恩返し',t:'トントンの加護',fx:'後半ステージの「謎の攻撃」を無効化',ic:'🐷'},
  revive:{q:'死線を越えし者',t:'黄泉還り',fx:'最大HP 2.0倍（増えた分は黄色のゲージ・蘇りマーク付き）',ic:'👼'}
 };
@@ -863,11 +866,12 @@ function statsOf(m){
 
 /* ---------- 絆レベル（なでる：1日3回まで） ---------- */
 const qToday=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
-function petLeft(m){return m.bd===qToday()?QC.BOND_DAY-(m.bn||0):QC.BOND_DAY}
+const petMax=m=>hasT(m,'pet')?10:QC.BOND_DAY;   // 撫でられ上手は1日10回
+function petLeft(m){return m.bd===qToday()?petMax(m)-(m.bn||0):petMax(m)}
 function petMon(){const m=cur();if(!m||m.dead||m.stage==='egg')return;m.bond=m.bond||0;
  if(m.bond>=QC.BOND_MAX)return msg('絆レベルは最大です');
  if(m.bd!==qToday()){m.bd=qToday();m.bn=0}
- if(m.bn>=QC.BOND_DAY&&!isGM())return msg('今日はもう十分なかよくなった。また明日！');   // GMは1日の回数制限なし
+ if(m.bn>=petMax(m)&&!isGM())return msg('今日はもう十分なかよくなった。また明日！');   // GMは1日の回数制限なし
  m.bn++;m.bond++;qCnt('pet');let t=`${nmOf(m)}をなでた！ 絆Lv.${m.bond}`;
  if(m.bond%QC.BOND_STEP===0){const k=['hp','atk','def'][Math.floor(Math.random()*3)];m.bs=m.bs||{};m.bs[k]=(m.bs[k]||0)+QC.BOND_BONUS;t+=`　💞絆ボーナス！ ${SN[k]}+${QC.BOND_BONUS}`;m.flash=1.2}
  fxQ.push({m,k:'egg'});act(t)}
@@ -886,7 +890,7 @@ function limitBreak(){const m=cur();if(!m)return;m.lb=m.lb||0;if(m.lb>=QC.LB_MAX
 /* ---------- 選択パネルに追記 ---------- */
 const _qUi=ui;
 ui=function(){qInit();_qUi();qBadge();const m=cur();if(!m)return;const st=statsOf(m),need=QC.LB_NEED[m.rar||0],n=Math.min(need,lbMats(m).length);
- let h=`<div class="qx">${roleTag(m)} HP ${st.hp}・攻 ${st.atk}・防 ${st.def}・速 ${st.as}/秒<br>💞 絆Lv.${m.bond||0}/${QC.BOND_MAX}　⭐ ${m.lb||0}/${QC.LB_MAX}凸</div>`;
+ let h=`<div class="qx">${m.titles?Object.keys(m.titles).map(k=>TITLES[k].ic).join('')+' ':''}${roleTag(m)} HP ${st.hp}・攻 ${st.atk}・防 ${st.def}・速 ${st.as}/秒<br>💞 絆Lv.${m.bond||0}/${QC.BOND_MAX}　⭐ ${m.lb||0}/${QC.LB_MAX}凸</div>`;
  if(!m.dead)h+=`<div>${m.stage!=='egg'?`<button onclick="petMon()" ${(petLeft(m)<1&&!isGM())||(m.bond||0)>=QC.BOND_MAX?'disabled':''}>🤝 なでる（${isGM()?'GM：無制限':'今日あと'+Math.max(0,petLeft(m))+'回'}）</button>`:''}<button onclick="limitBreak()" ${(m.lb||0)>=QC.LB_MAX?'disabled':''}>⭐ 凸（素材 ${n}/${need}）</button>${S.shard>0?`<button onclick="shardLB()" ${(m.lb||0)>=QC.LB_MAX?'disabled':''}>${ic('shard')}欠片で凸（${S.shard}）</button>`:''}</div>`;
  if(isGM())h+=`<div class="dev">GM：<button onclick="gmMove100()">🌗 10回移動済みにする</button>（移動 ${m.mv||0}回）</div>`;
  $('panel').insertAdjacentHTML('beforeend',h)};
@@ -910,7 +914,7 @@ const _qNk=nickOk;nickOk=function(){_qNk();hqCheck()};
 const qPopQ=[];
 function qPopShow(k,m){qPopQ.push({k,m});if(qPopQ.length===1)qPopNext()}
 function qPopNext(){const it=qPopQ[0];if(!it)return;const k=it.k,m=it.m,T=TITLES[k],p=$('qpop');
- p.innerHTML=`<div class="qray"></div><div class="qpc"><div class="qp1">クエスト達成！</div><div class="qp2">隠しクエスト「${T.q}」</div><div class="qp3">${m?`<div style="width:96px;margin:0 auto">${qImgM(m)}</div>`:''}${T.ic}</div><div class="qp4">${m?nmOf(m)+'が':''}称号「${T.t}」を獲得！</div><div class="qp5">バトル効果：${T.fx}</div><div class="qp6">タップでとじる</div></div>`+
+ p.innerHTML=`<div class="qray"></div><div class="qpc"><div class="qp1">${T.born?'称号獲得！':'クエスト達成！'}</div><div class="qp2">${T.born?'召喚ボーナス：特別な個体が生まれた！':'隠しクエスト「'+T.q+'」'}</div><div class="qp3">${m?`<div style="width:96px;margin:0 auto">${qImgM(m)}</div>`:''}${T.ic}</div><div class="qp4">${m?nmOf(m)+'が':''}称号「${T.t}」を獲得！</div><div class="qp5">バトル効果：${T.fx}</div><div class="qp6">タップでとじる</div></div>`+
   Array.from({length:24},(_,i)=>`<i class="qcf" style="left:${Math.random()*100}%;animation-delay:${(Math.random()*1.2).toFixed(2)}s;animation-duration:${(1.8+Math.random()*1.5).toFixed(2)}s">${['✨','🎉','⭐','💫'][i%4]}</i>`).join('');
  p.style.display='block';p.onclick=()=>{p.style.display='none';qPopQ.shift();setTimeout(qPopNext,200)}}
 
@@ -1050,6 +1054,13 @@ function qbClose(){qbT.forEach(clearTimeout);qbT=[];$('qb').style.display='none'
 // 神族の調理：トントンを調理すると、食べたキャラ全員に称号「トントンの加護」
 {const o=cook;cook=function(){const m=cur();if(!m)return o();const sp=SPECIES[m.sp].n,eat=S.mons.filter(x=>x!==m&&!x.dead&&x.stage!=='egg');o();
  if(S.mons.includes(m))return;qCnt('cook');if(sp==='オケアノ')qCnt('cookO');if(sp==='トントン'){qCnt('cookT');eat.forEach(x=>qGrant(x,'tonton'))}}}
+
+/* ---------- 召喚ボーナス称号（撫でられ上手・規格外の遺伝子）：それぞれ1%、両方つくことも ---------- */
+const qBornPend=[];
+function qBorn(e){if(!e||e.shard)return;['pet','gene'].forEach(k=>{if(Math.random()<QC.BORN_P){e.titles=e.titles||{};e.titles[k]=Date.now();if(k==='gene')e.lb=QC.LB_MAX;qBornPend.push([k,e])}})}
+{const o=pullEgg;pullEgg=function(){const e=o();qBorn(e);return e}}
+{const o=buyEgg;buyEgg=function(mode){const b=S.box.length;if(mode==='pick'){const R=Math.random;o(mode);if(S.box.length>b)qBorn(S.box[S.box.length-1])}else o(mode)}}
+{const o=closeGet;closeGet=function(){o();if(qBornPend.length){save();qBornPend.splice(0).forEach(([k,e])=>qPopShow(k,e))}}}
 
 /* ---------- 起動 ---------- */
 {const b=document.querySelector('[onclick="questInfo()"]');if(b){b.setAttribute('onclick','openQuest()');b.innerHTML='🚪 クエスト<span id="qbadge"></span>'}}
