@@ -286,7 +286,7 @@ function boxAct(){const sel=boxSelected(),n=sel.length,free=S.size**2-S.mons.len
  $('boxInfo').innerHTML=`📦 ${S.box.length}/${S.boxCap}　コロニーの空き ${free}`;
  $('boxAct').innerHTML=`<div>選択 <b>${n}</b>個${n?`　売却合計 ${ic('coin')}${tot}`:''}</div><div style="margin-top:4px"><button onclick="boxMoveSel()" ${n&&n<=free?'':'disabled'}>コロニーへ放出</button><button onclick="boxSellSel()" ${n?'':'disabled'}>売却</button></div>${n>free?'<div class="dev">選択数がコロニーの空きより多いので、売却のみできます</div>':''}`}
 function boxList(){const L=$('boxList');if(!L)return;const f=boxFiltered();
- L.innerHTML=f.map(m=>{const R=C.RARITY[m.rar||0];return `<div class="bcard ${boxSet.has(String(m.id))?'sel':''}" data-id="${m.id}" style="border-color:${R.col}" onclick="boxTap('${m.id}')"><i class="egi eg${m.sp}"></i><div class="bn">${nmOf(m)}</div></div>`}).join('')||'<div class="dev" style="grid-column:1/-1">該当するたまごがありません</div>';boxAct()}
+ L.innerHTML=f.map(m=>{const R=C.RARITY[m.rar||0];return `<div class="bcard ${boxSet.has(String(m.id))?'sel':''}" data-id="${m.id}" style="border-color:${R.col}" onclick="boxTap('${m.id}')">${m.titles&&Object.keys(m.titles).length?`<span class="bti">${Object.keys(m.titles).map(k=>TITLES[k].ic).join('')}</span>`:''}<i class="egi eg${m.sp}"></i><div class="bn">${m.titles&&Object.keys(m.titles).length?Object.keys(m.titles).map(k=>TITLES[k].ic).join('')+' ':''}${nmOf(m)}</div></div>`}).join('')||'<div class="dev" style="grid-column:1/-1">該当するたまごがありません</div>';boxAct()}
 function boxUI(){if($('boxm').style.display!=='flex')return;const ids=new Set(S.box.map(m=>String(m.id)));[...boxSet].forEach(i=>{if(!ids.has(i))boxSet.delete(i)});boxList()}
 function boxTap(id){if(boxSet.has(id))boxSet.delete(id);else boxSet.add(id);const el=document.querySelector('[data-id="'+id+'"]');if(el)el.classList.toggle('sel',boxSet.has(id));boxAct()}
 function boxAll(){boxFiltered().forEach(m=>boxSet.add(String(m.id)));boxList()}
@@ -673,6 +673,9 @@ requestAnimationFrame(frame);
 @keyframes qfl2{to{top:-15px}}
 .qlog{min-height:1.5em;text-align:center;color:#ffe08a;font-size:15px;font-weight:bold;text-shadow:0 2px 0 #000;margin:4px 0}
 .qst2{display:flex;justify-content:space-between;align-items:center;gap:6px;background:#0005;border:2px solid #ffe08a;border-radius:8px;padding:6px 8px;margin:4px 0}.qst2 button{font-size:12px;line-height:1.3}
+.bcard{position:relative}.bti{position:absolute;top:-6px;right:-6px;background:#2a1f4a;border:2px solid #ffd23f;border-radius:10px;padding:0 3px;font-size:11px;line-height:16px;z-index:1;box-shadow:0 0 6px #ffd23f;animation:qtglow 1.6s ease-in-out infinite alternate}
+@keyframes qtglow{to{box-shadow:0 0 12px #ffd23f}}
+.gmon{background:#ffe08a!important;color:#111!important}
 .qch{margin:10px 0 2px;padding:3px 8px;background:#ffe08a;color:#111;border-radius:6px;font-weight:bold;font-size:13px}
 #qbr{text-align:center;margin:6px 0}.qwin{font-size:26px;color:#ffe08a;font-weight:bold}.qlose{font-size:22px;color:#ff9a9a;font-weight:bold}
 #qbs{align-self:center}
@@ -710,8 +713,9 @@ const QC={
  TIME_LIMIT:90, SPEED:2,
  REPEAT_RATE:0.05,                    // 2回目のクリア報酬・XP（初回の何倍か）
  ST_MAX:10, ST_REGEN:3600,             // クエスト用の体力：最大10、1時間に1回復
- ST_BUY:{n:5,coin:10000,gem:100,stone:100}, // 体力5回復の値段
- NAZO:0.2,                            // 謎の攻撃：最大HPの2割
+ ST_BUY:{n:5,coin:1000,gem:100,stone:100}, // 体力5回復の値段
+ NAZO:0.2,
+ CURSE:0.5,                           // 操られた王様の呪い：もとの最大HPの50%（黄泉還りで増えた分は対象外）                            // 謎の攻撃：最大HPの2割
  BORN_P:0.01,                         // 召喚したキャラに「撫でられ上手」「規格外の遺伝子」がそれぞれ付く確率（どのレア度でも）
  NM_DROP:0.01,                        // クエストクリアのたびに「悪夢の料理」が落ちる確率
  REPEAT_DECAY:0.7,                    // 3回目以降は、クリアするたびに前回の0.7倍に減っていく              // バトルの制限時間(秒) / 再生速度
@@ -740,7 +744,7 @@ const QUESTS=[
  {n:'イルカの入江',xp:82,r:{coin:1800,stone:120},f:{gem:24},e:[['dolphin',1815,110,24,1.2],['dolphin',1815,110,24,1.2],['piranha',908,99,8,1.3],['piranha',908,99,8,1.3]]},
  {n:'地底のトンネル',xp:88,r:{coin:1950},f:{gem:26},e:[['worm',5092,126,47,0.7],['worm',5092,126,47,0.7],['bat',1018,79,0,1.4],['bat',1018,79,0,1.4],['bat',1018,79,0,1.4]]},
  {n:'ゴーレムの洞窟',xp:94,r:{coin:2100},f:{gem:28},e:[['golem',3825,125,108,0.6],['bat',287,42,0,1.4],['bat',287,42,0,1.4]]},
- {n:'【中ボス】黄金拳マオ',boss:1,xp:100,r:{coin:2250,stone:150},f:{gem:90},e:[['mao',6354,58,107,1.2]]},
+ {n:'【中ボス】黄金拳マオ',hint:'2.5秒ごとに黄金の拳が仲間を一撃で打ち抜く。名の力（📛）も通じない…🏰「鉄壁」をもつ仲間を連れていこう',boss:1,xp:100,r:{coin:2250,stone:150},f:{gem:90},e:[['mao',36000,45,40,1.2,['fist']]]},
  {n:'霧の墓地',ch:'第4章　墓地と城',xp:106,r:{coin:2400},f:{gem:32},e:[['ghost',2738,146,0,1],['ghost',2738,146,0,1],['ghost',2738,146,0,1],['zombie',7302,164,34,0.7],['zombie',7302,164,34,0.7]]},
  {n:'骨の兵団',xp:112,r:{coin:2550},f:{gem:34},e:[['skel',2738,141,52,1],['skel',2738,141,52,1],['skel',2738,141,52,1],['skel',2738,141,52,1],['ghost',1643,113,0,1],['ghost',1643,113,0,1]]},
  {n:'フランケンの研究所',xp:118,r:{coin:2700,stone:180},f:{gem:36},e:[['franken',9571,224,115,0.7],['zombie',3403,112,23,0.7],['zombie',3403,112,23,0.7],['zombie',3403,112,23,0.7]]},
@@ -749,14 +753,14 @@ const QUESTS=[
  {n:'砂の迷宮',ch:'第5章　砂漠とサーカス',xp:136,r:{coin:3150,stone:210},f:{gem:42},e:[['sand',8503,194,117,0.8],['sand',8503,194,117,0.8],['worm',6377,141,52,0.7],['worm',6377,141,52,0.7]]},
  {n:'夜のサーカス',xp:142,r:{coin:3300},f:{gem:44},e:[['clown',4454,214,53,1.3],['clown',4454,214,53,1.3],['clown',4454,214,53,1.3],['ghost',1670,114,0,1],['ghost',1670,114,0,1]]},
  {n:'鋼の侍たち',xp:148,r:{coin:3450},f:{gem:46},e:[['msamurai',6202,246,136,1.1],['msamurai',6202,246,136,1.1],['robot',4548,184,114,1]]},
- {n:'操られた王の間',xp:154,r:{coin:3600,stone:240},f:{gem:48},e:[['king',10671,306,119,1],['skel',3557,161,60,1],['skel',3557,161,60,1],['skel',3557,161,60,1],['ghost',2134,129,0,1],['ghost',2134,129,0,1]]},
- {n:'【中ボス】笑う道化師',boss:1,xp:160,r:{coin:3750},f:{gem:150},e:[['clown',6901,80,66,1.3],['clown',6901,266,66,1.3],['clown',6901,266,66,1.3],['gas',4313,124,0,1]]},
+ {n:'操られた王の間',hint:'王様を倒すと、呪いが全員の体力を50%けずる。トントンの加護も効かない…👼黄泉還りで体力を増やして耐えろ',xp:154,r:{coin:3600,stone:240},f:{gem:48},e:[['king',34681,306,119,1],['skel',4624,322,60,1],['skel',4624,322,60,1],['skel',4624,322,60,1],['ghost',2774,258,0,1],['ghost',2774,258,0,1]]},
+ {n:'【中ボス】笑う道化師',boss:1,rdeb:[1,0.85,0.7,0.5,0.2],hint:'道化師の呪いで、レア度が高いほど全ステータスが下がる（N:なし／R:-15%／SR:-30%／UR:-50%／GR:-80%）。低レアの仲間と称号で挑め',xp:160,r:{coin:3750},f:{gem:150},e:[['clown',9661,120,66,1.3],['clown',9661,399,66,1.3],['clown',9661,399,66,1.3],['gas',6038,186,0,1]]},
  {n:'毒ガスの谷',ch:'第6章　灼熱と毒の地',xp:166,r:{coin:3900},f:{gem:52},e:[['gas',9919,188,0,1],['gas',9919,188,0,1],['gas',9919,188,0,1],['gas',9919,188,0,1],['plant2',11903,242,60,0.8],['plant2',11903,242,60,0.8]]},
  {n:'毒虫の群れ',xp:172,r:{coin:4050,stone:270},f:{gem:54},e:[['beetle',10665,176,152,0.7],['beetle',10665,176,152,0.7],['larva',7110,118,65,0.6],['larva',7110,118,65,0.6],['larva',7110,118,65,0.6],['larva',7110,118,65,0.6]]},
  {n:'魔の大樹海',xp:178,r:{coin:4200},f:{gem:56},e:[['tree',14736,244,151,0.7],['tree',14736,244,151,0.7],['plant2',6801,183,45,0.8],['plant2',6801,183,45,0.8],['gas',5668,142,0,1]]},
  {n:'毒沼の巨人',xp:184,r:{coin:4350},f:{gem:58},e:[['franken',14067,272,140,0.7],['golem',12504,226,196,0.6],['gas',3126,106,0,1],['gas',3126,106,0,1]]},
  {n:'【BOSS】業火のフレイムイフリート',boss:1,hint:'燃えさかる業火が一気に体を焼きつくす。炎のあいだは回復も届かない…弱まるまで耐えられるか',dot:'🔥 業火が体を焼きつくす…回復が届かない！',burn:[0.1,15],xp:190,r:{coin:4500,stone:300},f:{gem:180},e:[['ifrit',140000,110,80,0.8,["poison"]]]},
- {n:'【最終BOSS】悪夢の李徴',ch:'裏章　悪夢の果て',boss:1,hint:'疾風・即死・瘴気…すべての悪夢が同時におそいかかる。瘴気で回復は封じられる。隠しクエストをすべて越え、最強の仲間をそろえた者だけが勝てる',dot:'☣️ 悪夢の瘴気が体をむしばむ…回復が届かない！',noheal:1,ke:1.5,xp:196,r:{coin:14650},f:{gem:1000},e:[['richou',9000,300,470,0.7,["pre","kill","poison"]]]}
+ {n:'【最終BOSS】悪夢の李徴',ch:'裏章　悪夢の果て',boss:1,hint:'疾風・即死・瘴気…すべての悪夢が同時におそいかかる。瘴気で回復は封じられる。隠しクエストをすべて越え、最強の仲間をそろえた者だけが勝てる',dot:'☣️ 悪夢の瘴気が体をむしばむ…回復が届かない！',noheal:1,ke:1.5,xp:196,r:{coin:14650},f:{gem:1000},e:[['richou',10000,300,470,0.7,["pre","kill","poison"]]]}
 ];
 QUESTS.forEach((q,i)=>{if(i>=15)q.nazo=1});   // 後半（16面〜）：開始時に「謎の攻撃」で体力が2割けずられる
 const TITLES={
@@ -849,13 +853,14 @@ const ROLES={
  def:{n:'タンク',ic:'🛡️',hp:1.25,atk:.75,def:1.6,as:1,d:'HPと防御が高く、敵の攻撃を引きつけやすい'},
  spd:{n:'スピード',ic:'💨',hp:.9,atk:.9,def:.9,as:1.35,d:'攻撃の回数が多い'},
  heal:{n:'ヒーラー',ic:'💚',hp:1.05,atk:.8,def:1,as:1,d:'HPが減った味方を回復する'},
+ wall:{n:'鉄壁',ic:'🏰',hp:1.7,atk:.45,def:2.2,as:.7,d:'HPが2以上あれば、どんな攻撃（即死も）もHP1で耐える。黄金の拳は何度でも耐える。防御を超えない攻撃は0ダメージ。どこにいても敵に狙われる'},
  buf:{n:'バッファー',ic:'📯',hp:1,atk:.9,def:1,as:1,d:'生きているあいだ、味方全員の攻撃力 +20%'},
  debuf:{n:'デバッファー',ic:'🌀',hp:1,atk:.9,def:1,as:1,d:'生きているあいだ、敵の防御 -30%・攻撃 -10%'}};
-const QROLE={ラグナ:'spd',サイクロ:'atk',アクアリ:'heal',ケリュネ:'heal',ククル:'atk',ノーム:'def',セレス:'heal',イースター:'spd',
- チュライム:'def',ホウオウ:'atk',ポチ太郎:'def',ホエル:'def',トレント:'def',マーシュド:'heal',モンピ:'spd',アラクニ:'atk',タチ:'spd',ハニーラ:'heal',ガード:'def',
- レぺリオ:'debuf',トントン:'def',パオーシャ:'def',ダークドラゴン:'atk',ヌエ:'atk',ルーンパンサー:'spd',ワタツミ:'atk',コスモオウル:'spd',クリスナイン:'buf',ネビュリス:'atk',オービット:'def',ペタ:'spd',パピリア:'heal',ゲンブル:'def',ミルティ:'atk',
- フォコン:'spd',タイジャ:'atk',メカ67号:'def',オーロラドラゴン:'atk',ステラード:'heal',ギャラクタ:'heal',ネプ:'def',オケアノ:'atk',
- オーロ:'atk',クラウン:'heal',ティア:'heal'};
+const QROLE={ラグナ:'spd',サイクロ:'atk',アクアリ:'def',ケリュネ:'spd',ククル:'atk',ノーム:'def',セレス:'heal',イースター:'spd',
+ チュライム:'def',ホウオウ:'atk',ポチ太郎:'def',ホエル:'def',トレント:'def',マーシュド:'heal',モンピ:'spd',アラクニ:'atk',タチ:'spd',ハニーラ:'atk',ガード:'wall',
+ レぺリオ:'debuf',トントン:'def',パオーシャ:'def',ダークドラゴン:'atk',ヌエ:'atk',ルーンパンサー:'spd',ワタツミ:'atk',コスモオウル:'spd',クリスナイン:'buf',ネビュリス:'atk',オービット:'wall',ペタ:'spd',パピリア:'heal',ゲンブル:'def',ミルティ:'atk',
+ フォコン:'spd',タイジャ:'atk',メカ67号:'def',オーロラドラゴン:'atk',ステラード:'heal',ギャラクタ:'def',ネプ:'def',オケアノ:'atk',
+ オーロ:'atk',クラウン:'spd',ティア:'heal'};
 const roleOf=m=>SPECIES[m.sp].role||QROLE[SPECIES[m.sp].n]||'atk';
 const roleTag=m=>{const R=ROLES[roleOf(m)];return `<span class="qrole">${R.ic}${R.n}</span>`};
 function statsOf(m){
@@ -892,7 +897,7 @@ const _qUi=ui;
 ui=function(){qInit();_qUi();qBadge();const m=cur();if(!m)return;const st=statsOf(m),need=QC.LB_NEED[m.rar||0],n=Math.min(need,lbMats(m).length);
  let h=`<div class="qx">${m.titles?Object.keys(m.titles).map(k=>TITLES[k].ic).join('')+' ':''}${roleTag(m)} HP ${st.hp}・攻 ${st.atk}・防 ${st.def}・速 ${st.as}/秒<br>💞 絆Lv.${m.bond||0}/${QC.BOND_MAX}　⭐ ${m.lb||0}/${QC.LB_MAX}凸</div>`;
  if(!m.dead)h+=`<div>${m.stage!=='egg'?`<button onclick="petMon()" ${(petLeft(m)<1&&!isGM())||(m.bond||0)>=QC.BOND_MAX?'disabled':''}>🤝 なでる（${isGM()?'GM：無制限':'今日あと'+Math.max(0,petLeft(m))+'回'}）</button>`:''}<button onclick="limitBreak()" ${(m.lb||0)>=QC.LB_MAX?'disabled':''}>⭐ 凸（素材 ${n}/${need}）</button>${S.shard>0?`<button onclick="shardLB()" ${(m.lb||0)>=QC.LB_MAX?'disabled':''}>${ic('shard')}欠片で凸（${S.shard}）</button>`:''}</div>`;
- if(isGM())h+=`<div class="dev">GM：<button onclick="gmMove100()">🌗 10回移動済みにする</button>（移動 ${m.mv||0}回）</div>`;
+ if(isGM())h+=`<div class="dev">GM：称号 ${Object.keys(TITLES).map(k=>`<button class="${hasT(m,k)?'gmon':''}" onclick="gmTitle('${k}')">${TITLES[k].ic}</button>`).join('')}</div>`;
  $('panel').insertAdjacentHTML('beforeend',h)};
 
 /* ---------- 隠しクエスト（裏カウント・非表示） ---------- */
@@ -905,8 +910,10 @@ function hqCheck(){qInit();allMons().forEach(m=>{
 function qGrant(m,k){if(hasT(m,k))return;m.titles=m.titles||{};m.titles[k]=Date.now();save();qPopShow(k,m)}
 const _qSw=switchCol;switchCol=function(){const a=S.cur;_qSw();if(S.cur!==a){qInit();S.hq.mv++;hqCheck();save()}};
 const _qMv=moveCol;moveCol=function(){const m=cur(),n=S.mons.length;_qMv();if(S.mons.length<n){qInit();S.hq.mv++;if(m)m.mv=(m.mv||0)+1;hqCheck();save()}};
-// GM専用：選んだキャラを「コロニー間を10回移動し終えた」状態にする
-function gmMove100(){if(!isGM())return;const m=cur();if(!m)return;qInit();m.mv=Math.max(m.mv||0,QC.HQ_MOVE);act(`GM：${nmOf(m)}を10回移動済みにした`);hqCheck()}
+// GM専用：選んだキャラの称号を付けたり外したりする（規格外の遺伝子は付けると完凸）
+function gmTitle(k){if(!isGM())return;const m=cur();if(!m||!TITLES[k])return;m.titles=m.titles||{};
+ if(m.titles[k]){delete m.titles[k];act(`GM：${nmOf(m)}の称号「${TITLES[k].t}」を外した`)}
+ else{m.titles[k]=Date.now();if(k==='gene')m.lb=QC.LB_MAX;act(`GM：${nmOf(m)}に称号「${TITLES[k].t}」を付けた`)}}
 const _qRv=revive;revive=function(){const m=cur(),d=m&&m.dead;_qRv();if(d&&!m.dead){qInit();S.hq.rv++;m.rv=(m.rv||0)+1;hqCheck();save()}};
 const _qNk=nickOk;nickOk=function(){_qNk();hqCheck()};
 
@@ -920,14 +927,19 @@ function qPopNext(){const it=qPopQ[0];if(!it)return;const k=it.k,m=it.m,T=TITLES
 
 /* ---------- バトル計算 ---------- */
 function qUnitP(m,i){const s=statsOf(m),T=m.titles||{};let hp=s.hp;if(T.revive)hp*=2;const as=s.as*(T.wander?1.5:1);
- return {key:'p'+i,side:0,sp:m.sp,st:m.stage,bhp:s.hp,role:roleOf(m),ton:!!T.tonton,n:nmOf(m),max:hp,hp,atk:s.atk,def:s.def,as,nx:T.wander?0:1/as,endure:!!T.bond,rev:!!T.revive}}
+ return {key:'p'+i,side:0,sp:m.sp,st:m.stage,rar:m.rar||0,bhp:s.hp,role:roleOf(m),ton:!!T.tonton,n:nmOf(m),max:hp,hp,atk:s.atk,def:s.def,as,nx:T.wander?0:1/as,endure:!!T.bond,rev:!!T.revive}}
 function qUnitE(e,i){return {key:'e'+i,side:1,en:e[0],n:ENM[e[0]],max:e[1],hp:e[1],bhp:e[1],atk:e[2],def:e[3],as:e[4],nx:1/e[4],g:e[5]||[]}}
 function qSim(q,P){const E=q.e.map(qUnitE),L=[],dt=.05,al=a=>a.filter(u=>u.hp>0),gs=E.flatMap(e=>e.g);if(q.boss&&E[0])E[0].boss=true;
+ const tnt=a=>{const w=a.filter(x=>x.role==='wall');return w.length?w:a},   // 鉄壁がいれば必ずそちらが狙われる
+  fe=q.fe||2.5;let fist=gs.includes('fist')?fe:-1;
  const both=gs.includes('kill')&&gs.includes('poison'),pd=d=>q.burn?Math.max(1,Math.round(d.bhp*q.burn[0]*Math.exp(-t/q.burn[1]))):QC.POISON; // burn=[初期の割合/秒, 弱まる速さ(秒)]
  let pre=gs.includes('pre')?QC.PRE_AT:-1,ke=q.ke||QC.KILL_EVERY,kill=gs.includes('kill')?ke:-1,poi=gs.includes('poison')?1:-1,acted=false,t=0,win=null;
+ if(q.rdeb){P.forEach(u=>{const f=q.rdeb[u.rar||0];['max','hp','bhp','atk','def'].forEach(k=>u[k]=Math.max(1,Math.round(u[k]*f)));u.as*=f;u.nx=u.nx?1/u.as:0});L.push({t:0,k:'rdeb'})}   // 道化師：レア度が高いほど全ステータスDOWN
  if(q.nazo){L.push({t:0,k:'nazo'});P.forEach(d=>{if(d.ton)L.push({t:0,k:'block',d:d.key});else{const v=Math.round(d.max*QC.NAZO);d.hp=Math.max(1,d.hp-v);L.push({t:0,k:'nz',d:d.key,v,hp:d.hp})}})}
- const hit=(s,d,v,k)=>{if(d.hp-v<=0&&d.endure&&k!=='pre'){d.endure=false;d.hp=1;d.pim=both;L.push({t,k:'endure',s:s&&s.key,d:d.key,v,hp:1});return}
-  d.hp=Math.max(0,d.hp-v);L.push({t,k,s:s&&s.key,d:d.key,v,hp:d.hp})};
+ const hit=(s,d,v,k)=>{if(d.role==='wall'&&k!=='pre'&&k!=='curse'&&d.hp-v<=0&&(d.hp>1||k==='fist')){d.hp=1;L.push({t,k:'guts',d:d.key,v,hp:1});return}   // 鉄壁：HP1で耐える
+  if(d.hp-v<=0&&d.endure&&k!=='pre'&&k!=='fist'&&k!=='curse'){d.endure=false;d.hp=1;d.pim=both;L.push({t,k:'endure',s:s&&s.key,d:d.key,v,hp:1});return}
+  d.hp=Math.max(0,d.hp-v);L.push({t,k,s:s&&s.key,d:d.key,v,hp:d.hp});if(d.side&&d.hp<=0&&d.en==='king'&&!d.cu){d.cu=1;curse.push(d)}};
+ const curse=[];   // 操られた王様：倒されると全体に最大HPの50%ダメージ（トントンの加護も📛も🏰も無効）
  for(;t<=QC.TIME_LIMIT;t=Math.round((t+dt)*100)/100){
   const bf=P.some(u=>u.hp>0&&u.role==='buf')?1.2:1,db=P.some(u=>u.hp>0&&u.role==='debuf');
   for(const u of [...P,...E]){if(u.hp<=0||t<u.nx)continue;u.nx+=1/u.as;
@@ -936,10 +948,13 @@ function qSim(q,P){const E=q.e.map(qUnitE),L=[],dt=.05,al=a=>a.filter(u=>u.hp>0)
      if(w&&w.hp/w.max<.8){const v=Math.min(w.max-w.hp,Math.round(u.atk*2.2));w.hp+=v;L.push({t,k:'heal',s:u.key,d:w.key,v,hp:w.hp});continue}}
     const tg=al(E);if(!tg.length)break;const d=tg[0];hit(u,d,Math.max(1,Math.round(u.atk*bf-(db?d.def*.7:d.def))),'hit')}
    else{const tg=al(P);if(!tg.length)break;const ea=db?u.atk*.9:u.atk;
-    if(u.boss){for(let r=0;r<2;r++)al(P).forEach(d=>hit(u,d,Math.max(1,Math.round(ea-d.def)),'hit'))}   // ボス：全体攻撃を2回
-    else{const tk=tg.filter(x=>x.role==='def'),pool=tk.length&&Math.random()<.5?tk:tg,d=pool[Math.floor(Math.random()*pool.length)];hit(u,d,Math.max(1,Math.round(ea-d.def)),'hit')}}}
+    const dm=d=>Math.max(d.role==='wall'?0:1,Math.round(ea-d.def));   // 鉄壁は防御を超えない攻撃を0にする
+    if(u.boss){for(let r=0;r<2;r++)al(P).forEach(d=>hit(u,d,dm(d),'hit'))}   // ボス：全体攻撃を2回
+    else{const tw=tnt(tg),tk=tg.filter(x=>x.role==='def'),pool=tw!==tg?tw:(tk.length&&Math.random()<.5?tk:tg),d=pool[Math.floor(Math.random()*pool.length)];hit(u,d,dm(d),'hit')}}}
   if(pre>=0&&t>=pre){pre=-1;if(acted)L.push({t,k:'cancel'});else{L.push({t,k:'pre'});al(P).forEach(d=>hit(E[0],d,99999,'pre'))}}
-  if(kill>=0&&t>=kill){kill+=ke;const tg=al(P);if(tg.length){const d=tg[Math.floor(Math.random()*tg.length)];L.push({t,k:'reap',d:d.key});hit(E[0],d,d.hp,'kill')}}
+  while(curse.length){curse.shift();L.push({t,k:'curseA'});al(P).forEach(d=>hit(null,d,Math.round(d.bhp*QC.CURSE),'curse'))}
+  if(fist>=0&&t>=fist){fist+=fe;const tg=tnt(al(P));if(tg.length){const d=tg[Math.floor(Math.random()*tg.length)];L.push({t,k:'punch',d:d.key});hit(E[0],d,d.hp,'fist')}}   // 黄金の拳：名の力（📛）も貫通する即死
+  if(kill>=0&&t>=kill){kill+=ke;const tg=tnt(al(P));if(tg.length){const d=tg[Math.floor(Math.random()*tg.length)];L.push({t,k:'reap',d:d.key});hit(E[0],d,d.hp,'kill')}}
   if(poi>=0&&t>=poi){poi+=1;al(P).filter(d=>!d.pim).forEach(d=>hit(null,d,pd(d),'poison'))}
   if(!al(E).length){win=true;break}if(!al(P).length){win=false;break}}
  return {win:!!win,timeout:win===null,t,L,P,E}}
@@ -1020,6 +1035,10 @@ function qbAnim(c,cls){if(!c)return;c.classList.remove(cls);void c.offsetWidth;c
 let qPoiLog=false;
 function qbEv(ev){const U=qbR.U,n=k=>U[k]?U[k].n:'';
  if(ev.k==='pre'){qbLog('⚡ 目にもとまらぬ先制攻撃！');qbAnim($('qu_e0'),'qatkE');return}
+ if(ev.k==='punch'){qbLog(`👊 黄金の拳が${n(ev.d)}を打ち抜く！`);qbAnim($('qu_e0'),'qatkE');return}
+ if(ev.k==='guts')qbLog(`🏰 ${n(ev.d)}は鉄壁で耐えた！`);
+ if(ev.k==='rdeb')return qbLog('🤡 道化師の呪い：レア度が高いほど力がぬけていく…');
+ if(ev.k==='curseA'){qbLog('👑 操られた王様が倒れ、呪いが全員の体力を50%けずる！');return}
  if(ev.k==='nazo')return qbLog('❓ どこからともなく謎の攻撃！ 体力が2割けずられた');
  if(ev.k==='block'){qbLog('🐷 トントンの加護が謎の攻撃をふせいだ！');const c=$('qu_'+ev.d);if(c){const f=document.createElement('span');f.className='qfl qhe';f.textContent='無効';c.appendChild(f);setTimeout(()=>f.remove(),750)}return}
  if(ev.k==='cancel')return qbLog('🌗 黄昏の素早さで先に動き、先制攻撃を阻止した！');
@@ -1029,7 +1048,7 @@ function qbEv(ev){const U=qbR.U,n=k=>U[k]?U[k].n:'';
  const src=ev.s&&(ev.k==='hit'||ev.k==='heal')?U[ev.s]:null;
  if(src)qbAnim($('qu_'+ev.s),src.side?'qatkE':'qatkP');            // 攻撃するキャラがぴょんと跳ねる
  const hitNow=()=>{qbHp(ev.d,ev.hp);const c=$('qu_'+ev.d);if(!c||ev.v==null)return;qbAnim(c,'qhit');
-  const f=document.createElement('span');f.className='qfl'+(ev.k==='heal'?' qhe':ev.k==='poison'||ev.k==='nz'?' qpo':ev.k==='hit'?'':' qbig');f.textContent=ev.k==='heal'?'+'+ev.v:ev.k==='endure'?'耐えた！':ev.v>=99999?'即死':'-'+ev.v;c.appendChild(f);setTimeout(()=>f.remove(),750)};
+  const f=document.createElement('span');f.className='qfl'+(ev.k==='heal'?' qhe':ev.k==='poison'||ev.k==='nz'||ev.k==='curse'?' qpo':ev.k==='hit'?'':' qbig');f.textContent=ev.k==='heal'?'+'+ev.v:ev.k==='endure'||ev.k==='guts'?'耐えた！':ev.v>=99999?'即死':'-'+ev.v;c.appendChild(f);setTimeout(()=>f.remove(),750)};
  if(src)qbT.push(setTimeout(hitNow,170));else hitNow()}               // 跳ねて着地した瞬間にダメージ
 function qbSkip(){qbT.forEach(clearTimeout);qbT=[];Object.values(qbR.U).forEach(u=>qbHp(u.key,u.hp));qbEnd()}
 function qbEnd(){qbT.forEach(clearTimeout);qbT=[];qPoiLog=false;const {R,rw}=qbR,r=$('qbr'),s=$('qbs');if(!r)return;if(s)s.style.visibility='hidden';
